@@ -1,3 +1,4 @@
+if (window.location.pathname.includes('/chart')) {
 // Injected Panel Setup
 let sidebar = document.createElement('div');
 sidebar.id = 'kronos-tv-sidebar';
@@ -233,3 +234,4 @@ async function submitManualOrder(action) {
 
 document.getElementById('btn-buy').addEventListener('click', () => submitManualOrder('BUY'));
 document.getElementById('btn-sell').addEventListener('click', () => submitManualOrder('SELL'));
+}

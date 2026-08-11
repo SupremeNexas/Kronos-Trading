@@ -8,11 +8,11 @@
   ],
   "host_permissions": [
     "http://localhost:7070/*",
-    "https://www.tradingview.com/*"
+    "https://*.tradingview.com/*"
   ],
   "content_scripts": [
     {
-      "matches": ["https://www.tradingview.com/chart/*", "https://*.tradingview.com/chart/*"],
+      "matches": ["https://*.tradingview.com/*"],
       "js": ["content.js"],
       "css": ["content.css"]
     }
