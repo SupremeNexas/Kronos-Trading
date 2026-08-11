@@ -4,7 +4,7 @@ import numpy as np
 import json
 import plotly.graph_objects as go
 import plotly.utils
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from flask_cors import CORS
 import sys
 import warnings
@@ -23,6 +23,27 @@ except ImportError:
 
 app = Flask(__name__)
 CORS(app)
+
+from webui.data_fetcher import fetch_symbol_data
+from webui.broker import MockBroker
+
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'paper_portfolio.json')
+broker = MockBroker(db_path)
+
+def ensure_model_loaded():
+    global tokenizer, model, predictor
+    if predictor is None:
+        if MODEL_AVAILABLE:
+            try:
+                model_config = AVAILABLE_MODELS['kronos-small']
+                tokenizer = KronosTokenizer.from_pretrained(model_config['tokenizer_id'])
+                model = Kronos.from_pretrained(model_config['model_id'])
+                predictor = KronosPredictor(model, tokenizer, device='cpu', max_context=512)
+                print("✅ Auto-loaded model: kronos-small")
+            except Exception as e:
+                print(f"⚠️ Auto-loading failed: {e}")
+        else:
+            print("⚠️ Kronos model library not available, simulated predictions will be returned (fallback)")
 
 # Global variables to store models
 tokenizer = None
@@ -696,6 +717,168 @@ def get_model_status():
             'loaded': False,
             'message': 'Kronos model library not available, please install related dependencies'
         })
+
+@app.route('/api/portfolio', methods=['GET'])
+def api_portfolio():
+    return jsonify({
+        "cash": broker.get_balance(),
+        "positions": broker.get_positions()
+    })
+
+@app.route('/api/trade_tv', methods=['POST'])
+def api_trade_tv():
+    data = request.get_json() or {}
+    symbol = data.get('symbol')
+    tx_type = data.get('action') # BUY/SELL
+    qty = float(data.get('quantity', 0))
+    price = float(data.get('price', 0))
+
+    if not all([symbol, tx_type, qty > 0, price > 0]):
+        return jsonify({'error': 'Missing required fields symbol, action, quantity, price'}), 400
+
+    res = broker.place_order(symbol, tx_type, qty, price)
+    if res["success"]:
+        return jsonify(res)
+    else:
+        return jsonify(res), 400
+
+@app.route('/api/predict_tv', methods=['POST'])
+def api_predict_tv():
+    ensure_model_loaded()
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1h')
+    pred_len = int(data.get('pred_len', 50))
+    auto_trade = data.get('auto_trade', False)
+
+    try:
+        # Fetch real time data
+        df = fetch_symbol_data(symbol, timeframe)
+        if len(df) < 50:
+            return jsonify({'error': f'Insufficient historical bars retrieved ({len(df)}), need at least 50'}), 400
+
+        # Align with lookback context limit
+        lookback = min(len(df) - 1, 400)
+        x_df = df.iloc[-lookback:][['open', 'high', 'low', 'close', 'volume']]
+        x_timestamp = df.iloc[-lookback:]['timestamps']
+
+        # Calculate predicted future timestamps
+        last_ts = x_timestamp.iloc[-1]
+        time_diff = df['timestamps'].iloc[-1] - df['timestamps'].iloc[-2] if len(df) > 1 else pd.Timedelta(hours=1)
+        future_ts = pd.date_range(start=last_ts + time_diff, periods=pred_len, freq=time_diff)
+
+        # Generate forecast
+        if MODEL_AVAILABLE and predictor is not None:
+            pred_df = predictor.predict(
+                df=x_df,
+                x_timestamp=pd.Series(x_timestamp.reset_index(drop=True)),
+                y_timestamp=pd.Series(future_ts),
+                pred_len=pred_len,
+                T=1.0,
+                top_p=0.9,
+                sample_count=1
+            )
+        else:
+            # Backup Simulation Mode
+            last_close = x_df['close'].iloc[-1]
+            sim_closes = last_close * (1.0 + np.cumsum(np.random.normal(0.0001, 0.002, pred_len)))
+            pred_df = pd.DataFrame({
+                'open': sim_closes,
+                'high': sim_closes * 1.002,
+                'low': sim_closes * 0.998,
+                'close': sim_closes,
+                'volume': np.random.randint(10, 100, pred_len)
+            })
+
+        # Compute signals & alerts
+        last_close = x_df['close'].iloc[-1]
+        pred_closes = pred_df['close'].tolist()
+        net_change = (pred_closes[-1] - last_close) / last_close
+
+        signal = "HOLD"
+        sl = last_close * 0.99
+        tp = last_close * 1.03
+
+        if net_change > 0.015:
+            signal = "BUY"
+            tp = max(pred_closes)
+        elif net_change < -0.015:
+            signal = "SELL"
+            sl = max(pred_closes)
+            tp = min(pred_closes)
+
+        order_info = None
+        current_positions = broker.get_positions()
+        current_cash = broker.get_balance()
+
+        # Auto trade logic implementation
+        if auto_trade and signal in ["BUY", "SELL"]:
+            last_price = last_close
+            if signal == "BUY" and symbol not in current_positions:
+                cash_to_use = current_cash * 0.5
+                qty_to_buy = cash_to_use / last_price
+                if qty_to_buy > 0.0001:
+                    res = broker.place_order(symbol, "BUY", qty_to_buy, last_price)
+                    if res["success"]:
+                        order_info = res
+            elif signal == "SELL" and symbol in current_positions:
+                qty_to_sell = current_positions[symbol]["quantity"]
+                if qty_to_sell > 0:
+                    res = broker.place_order(symbol, "SELL", qty_to_sell, last_price)
+                    if res["success"]:
+                        order_info = res
+
+        # Return structure for UI
+        history_data = []
+        for i, row in x_df.reset_index().iterrows():
+            history_data.append({
+                'time': x_timestamp.iloc[i].isoformat() if hasattr(x_timestamp.iloc[i], 'isoformat') else str(x_timestamp.iloc[i]),
+                'open': float(row['open']),
+                'high': float(row['high']),
+                'low': float(row['low']),
+                'close': float(row['close']),
+                'volume': float(row['volume'])
+            })
+
+        pred_data = []
+        for i, row in pred_df.reset_index().iterrows():
+            pred_data.append({
+                'time': future_ts[i].isoformat(),
+                'open': float(row['open']),
+                'high': float(row['high']),
+                'low': float(row['low']),
+                'close': float(row['close']),
+                'volume': float(row['volume'])
+            })
+
+        return jsonify({
+            'success': True,
+            'symbol': symbol,
+            'timeframe': timeframe,
+            'history': history_data,
+            'prediction': pred_data,
+            'signal': signal,
+            'entry_price': last_close,
+            'stop_loss': sl,
+            'take_profit': tp,
+            'cash': broker.get_balance(),
+            'positions': broker.get_positions(),
+            'executed_order': order_info
+        })
+
+    except Exception as e:
+        import traceback
+        print(f"Error in api_predict_tv: {e}")
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/tradingview-sandbox')
+def tradingview_sandbox():
+    return render_template('sandbox.html')
+
+@app.route('/extension/<path:filename>')
+def serve_extension(filename):
+    return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'extension'), filename)
 
 if __name__ == '__main__':
     print("Starting Kronos Web UI...")

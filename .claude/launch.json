@@ -1,0 +1,21 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "vex-hero-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "/Users/supryo/Desktop/Kronos-master/vex-hero/node_modules/vite/bin/vite.js",
+        "/Users/supryo/Desktop/Kronos-master/vex-hero"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "kronos-webui",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["webui/app.py"],
+      "port": 7070,
+      "url": "http://localhost:7070"
+    }
+  ]
+}
