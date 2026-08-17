@@ -2,7 +2,7 @@
   <h2><b>Kronos: A Foundation Model for the Language of Financial Markets </b></h2>
 </div>
 
- 
+  
 <div align="center">
 
 </a> 
