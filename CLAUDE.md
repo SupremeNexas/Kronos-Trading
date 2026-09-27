@@ -45,9 +45,20 @@
 - Fine-tune predictor: `python finetune/train_predictor.py`
 - Configuration: `finetune/config.py`
 
+### Running Tests
+- Run all core tests:
+  ```bash
+  python3 -m pytest tests/
+  ```
+- Run agent engine unit tests specifically:
+  ```bash
+  python3 -m unittest tests/test_agents_engine.py
+  ```
+
 ## Project Structure
 - `model/` — Core implementation of Kronos model (`kronos.py`, `module.py`)
 - `webui/` — Flask Web UI application interface for visual forecasting
+- `webui/agents_engine/` — Pipeline execution, risk gate, memory, and checkpoints
 - `examples/` — Python scripts demonstrating prediction, data acquiring, and backtesting
 - `finetune/` — Scripts and configs to fine-tune Kronos on proprietary stock domains
 - `tests/` — Regression and unit tests for the ML pipeline

@@ -1,0 +1,667 @@
+[
+  {
+    "timestamp": "2026-09-05T21:56:28.189813",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-162AA505",
+      "time": "2026-09-05T21:56:28.187503",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_eb1cab64"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:56:28.358786",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-31761B6B",
+      "time": "2026-09-05T21:56:28.358593",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:56:28.361612",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-524FD81B",
+      "time": "2026-09-05T21:56:28.361475",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:56:28.363660",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-C7595D42",
+      "time": "2026-09-05T21:56:28.363540",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:56:28.365425",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-231D1AAD",
+      "time": "2026-09-05T21:56:28.365269",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:59:27.760539",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-6C1DD372",
+      "time": "2026-09-05T21:59:27.757231",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_bfb43e69"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:59:27.789378",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-F02641E8",
+      "time": "2026-09-05T21:59:27.789207",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:59:27.791573",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-95DC2760",
+      "time": "2026-09-05T21:59:27.791398",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:59:27.793482",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-8DA37D4E",
+      "time": "2026-09-05T21:59:27.793371",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T21:59:27.795007",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-6C575F24",
+      "time": "2026-09-05T21:59:27.794874",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:00:07.610475",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-C169D69F",
+      "time": "2026-09-05T22:00:07.608145",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_c78802b8"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:00:07.636708",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-2576F4D3",
+      "time": "2026-09-05T22:00:07.636547",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:00:07.638859",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-83F6F63C",
+      "time": "2026-09-05T22:00:07.638653",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:00:07.640484",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-5E1DFF1D",
+      "time": "2026-09-05T22:00:07.640399",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:00:07.641856",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-62B4C4FC",
+      "time": "2026-09-05T22:00:07.641722",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:03:50.974792",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-CE9CD2B6",
+      "time": "2026-09-05T22:03:50.971622",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_7be20746"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:03:51.005716",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-00C3BF94",
+      "time": "2026-09-05T22:03:51.005576",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:03:51.008397",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-B2A918AD",
+      "time": "2026-09-05T22:03:51.008221",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:03:51.010628",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-54002419",
+      "time": "2026-09-05T22:03:51.010529",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:03:51.012597",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-5A648D8D",
+      "time": "2026-09-05T22:03:51.012475",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:07:15.019513",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-AC408654",
+      "time": "2026-09-05T22:07:15.016210",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_19b2d735"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:07:15.049250",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-4F6369C4",
+      "time": "2026-09-05T22:07:15.049115",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:07:15.052075",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-BBBF90CE",
+      "time": "2026-09-05T22:07:15.051973",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:07:15.054332",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-4C84B27C",
+      "time": "2026-09-05T22:07:15.054225",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:07:15.056261",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-0D32BF50",
+      "time": "2026-09-05T22:07:15.056139",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:14:06.193623",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-CF988A09",
+      "time": "2026-09-05T22:14:06.188875",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_97023a5c"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:14:06.226393",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-0BBA5803",
+      "time": "2026-09-05T22:14:06.226178",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:14:06.229307",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-A972F73D",
+      "time": "2026-09-05T22:14:06.229180",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:14:06.231736",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-38745CAC",
+      "time": "2026-09-05T22:14:06.231632",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:14:06.233742",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-5CD8F382",
+      "time": "2026-09-05T22:14:06.233635",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:18:02.352419",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-0DC39839",
+      "time": "2026-09-05T22:18:02.348659",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_api_test_10bd6923"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:18:02.385629",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-462600A1",
+      "time": "2026-09-05T22:18:02.385434",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:18:02.388437",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-F31A065C",
+      "time": "2026-09-05T22:18:02.388329",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:18:02.390881",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-14924EB3",
+      "time": "2026-09-05T22:18:02.390776",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-09-05T22:18:02.393785",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-4AC1D9FB",
+      "time": "2026-09-05T22:18:02.393652",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  }
+]

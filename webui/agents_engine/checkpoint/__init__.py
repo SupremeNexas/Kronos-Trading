@@ -1,0 +1,1 @@
+# Checkpoint Manager package init

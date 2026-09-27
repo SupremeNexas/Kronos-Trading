@@ -1,0 +1,150 @@
+{
+  "report_id": "res_aapl_20260905_215927",
+  "symbol": "AAPL",
+  "company_name": "Apple Inc.",
+  "sector": "Consumer Electronics / Tech",
+  "timestamp": "2026-09-05T21:59:27.746914",
+  "data_freshness": "LIVE / Updated Sep 2026",
+  "overall_score": 4.0,
+  "recommendation": "BUY / ACCUMULATE",
+  "recommendation_color": "#059669",
+  "thesis_summary": "Apple Inc. demonstrates exceptional business quality (4.1/5) and financial health (4.4/5). With a Berkshire checklist score of 10/10, the company represents a high-conviction opportunity. Target Entry Range: $303.97 - $326.37.",
+  "checklist_passed_count": 10,
+  "checklist_total": 10,
+  "checklist": [
+    {
+      "item": "Understandable business model",
+      "passed": true,
+      "note": "Clear product & service revenue loops"
+    },
+    {
+      "item": "Durable competitive advantage (Moat)",
+      "passed": true,
+      "note": "Wide Moat \u2014 High switching costs within iOS ecosystem, premier brand pricing power, proprietary hardware-software integration."
+    },
+    {
+      "item": "Demonstrated pricing power",
+      "passed": true,
+      "note": "Gross Margin 44.1%"
+    },
+    {
+      "item": "Strong management & governance",
+      "passed": true,
+      "note": "Proven capital allocation track record"
+    },
+    {
+      "item": "High-quality balance sheet",
+      "passed": true,
+      "note": "Cash $61.5B / Debt $111.1B"
+    },
+    {
+      "item": "Consistent free cash flow generation",
+      "passed": true,
+      "note": "FCF $99.6B"
+    },
+    {
+      "item": "Attractive return on capital (ROE/ROIC)",
+      "passed": true,
+      "note": "ROE 147.2%"
+    },
+    {
+      "item": "Reasonable valuation relative to growth",
+      "passed": true,
+      "note": "P/E Ratio 29.5"
+    },
+    {
+      "item": "Adequate margin of safety",
+      "passed": true,
+      "note": "4.8% Safety Margin"
+    },
+    {
+      "item": "Long-term secular growth runway",
+      "passed": true,
+      "note": "7.8% 3-Yr CAGR"
+    }
+  ],
+  "scores": {
+    "business_quality": 4.1,
+    "financial_quality": 4.4,
+    "industry_position": 3.8,
+    "risk_assessment": 3.6,
+    "valuation_score": 4.4
+  },
+  "agents": {
+    "business_analyst": {
+      "agent": "Business Analyst",
+      "framework": "Duan Yongping 'Good Business' Framework",
+      "score": 4.1,
+      "business_model": "Designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories, and sells a variety of related services (App Store, Apple Pay, iCloud, Apple Music).",
+      "moat_assessment": "Wide Moat \u2014 High switching costs within iOS ecosystem, premier brand pricing power, proprietary hardware-software integration.",
+      "revenue_streams": [
+        "Primary Core Product & Hardware Sales",
+        "High-Margin Recurring Subscription & Digital Services",
+        "Enterprise Enterprise Licensing & Ecosystem Partnerships"
+      ],
+      "competitive_advantages": [
+        "High customer switching costs within unified ecosystem",
+        "Strong pricing power due to premium brand equity",
+        "Network effects amplifying user retention",
+        "Durable long-term competitive positioning"
+      ],
+      "duan_yongping_verdict": "Meets 'Stop Doing' list criteria \u2014 management stays focused on core competencies without reckless diversification. Score: 4.1/5"
+    },
+    "financial_analyst": {
+      "agent": "Financial Analyst",
+      "framework": "Warren Buffett Financial Quality & Margin of Safety",
+      "score": 4.4,
+      "metrics": {
+        "revenue": "$383.3B",
+        "net_income": "$97.0B",
+        "gross_margin": "44.1%",
+        "operating_margin": "30.1%",
+        "roe": "147.2%",
+        "free_cash_flow": "$99.6B",
+        "cash_reserve": "$61.5B",
+        "total_debt": "$111.1B",
+        "pe_ratio": 29.5,
+        "pb_ratio": 45.2,
+        "ps_ratio": 7.8
+      },
+      "intrinsic_value_est": 335.97,
+      "margin_of_safety_pct": 4.8,
+      "buffett_verdict": "Consistent owner earnings and ROE. Balance sheet displays strong debt coverage. Margin of safety: 4.8%. Score: 4.4/5"
+    },
+    "industry_researcher": {
+      "agent": "Industry Researcher",
+      "framework": "Charlie Munger Industry & Lollapalooza Dynamics",
+      "score": 3.8,
+      "sector": "Consumer Electronics / Tech",
+      "industry_growth_cagr": "7.8%",
+      "competitive_structure": "Oligopolistic market structure with high barriers to entry for new market participants.",
+      "technological_disruption_threat": "Low to Moderate \u2014 Company leads AI and digital transformation R&D.",
+      "munger_verdict": "Operating in a favorable tailwind industry where compound interest operates unimpeded over multi-year horizons. Score: 3.8/5"
+    },
+    "risk_assessor": {
+      "agent": "Risk Assessor",
+      "framework": "Li Lu Management Quality & Downside Protection",
+      "score": 3.6,
+      "management_governance": "Exemplary capital allocation track record with opportunistic share buybacks and dividend growth.",
+      "regulatory_risk": "Moderate \u2014 Ongoing antitrust scrutiny regarding app stores and ecosystem integration.",
+      "balance_sheet_risk": "Moderate Debt Risk (Cash: $61.5B vs Debt: $111.1B)",
+      "macro_risk": "Resilient consumer and enterprise demand across economic cycles.",
+      "li_lu_verdict": "Management demonstrates high integrity and long-term capital allocation stewardship. Downside risk is contained. Score: 3.6/5"
+    }
+  },
+  "bull_case": [
+    "Dominant market position in Consumer Electronics / Tech with wide competitive moat.",
+    "High profitability with gross margins of 44.1% and ROE of 147.2%.",
+    "Strong balance sheet featuring $61.5B in liquid cash reserves.",
+    "Robust annual free cash flow generation ($99.6B) supporting capital returns.",
+    "Ecosystem lock-in and pricing power enabling long-term earnings compounding."
+  ],
+  "bear_case": [
+    "Valuation at 29.5x earnings leaves limited margin for growth disappointment.",
+    "Potential regulatory scrutinies around ecosystem monetization and market share.",
+    "Macroeconomic headwinds affecting discretionary capital expenditures.",
+    "Geopolitical supply chain dependencies in key manufacturing regions.",
+    "Threat of disruptive emerging technologies shifting industry paradigms."
+  ],
+  "disclaimer": "DATA: Real-time feeds & SEC filings | ANALYSIS: 4-Agent Berkshire Engine | OPINION: AI Quantitative Research. Not financial advice."
+}

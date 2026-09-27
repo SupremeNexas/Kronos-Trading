@@ -1,21 +1,23 @@
-/* Embedded Sidebar Widget Styling */
+/* Embedded Sidebar Widget Styling - Glassmorphic dark mode matching VEX style */
 #kronos-tv-sidebar {
   position: fixed;
   bottom: 20px;
   right: 20px;
   width: 320px;
-  height: 480px;
-  background-color: #1c2030;
-  border: 2px solid #2a2e39;
-  border-radius: 12px;
+  height: 520px;
+  background: rgba(14, 18, 30, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   z-index: 2147483647; /* Ensure it stays on top of TradingView canvas */
-  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
   display: flex;
   flex-direction: column;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  color: #d1d4dc;
+  color: #f3f4f6;
   overflow: hidden;
-  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s;
 }
 
 #kronos-tv-sidebar.collapsed {
@@ -23,21 +25,21 @@
 }
 
 .kronos-header {
-  background-color: #131722;
+  background: rgba(9, 11, 20, 0.4);
   padding: 12px 15px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #2a2e39;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
   user-select: none;
 }
 
 .kronos-title {
-  font-weight: bold;
-  color: #26a69a;
-  font-size: 14px;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: #fff;
+  font-size: 13px;
+  letter-spacing: 0.3px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -50,54 +52,54 @@
   flex-direction: column;
   gap: 12px;
   overflow-y: auto;
-  background-color: #1c2030;
 }
 
 .kronos-info-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
-  border-bottom: 1.5px solid #2a2e39;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 6px;
+  color: #9ca3af;
 }
 
 .kronos-stats-box {
-  background-color: #131722;
+  background: rgba(0, 0, 0, 0.3);
   padding: 12px;
   border-radius: 8px;
-  font-size: 12.5px;
-  border: 1.5px solid #2a2e39;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
 .kronos-chart-area {
-  height: 180px;
-  background-color: #131722;
+  height: 160px;
+  background: rgba(0, 0, 0, 0.35);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px dashed #2a2e39;
+  border: 1.5px dashed rgba(255, 255, 255, 0.08);
   position: relative;
 }
 
 .kronos-btn {
-  background-color: #2962ff;
-  color: white;
+  background: #fff;
+  color: #000;
   border: none;
   padding: 10px 14px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 13px;
+  font-weight: 600;
+  font-size: 12px;
   transition: all 0.2s ease;
   width: 100%;
 }
 
 .kronos-btn:hover {
-  background-color: #1e54e4;
+  background: #e5e7eb;
   transform: translateY(-1px);
 }
 
@@ -111,18 +113,18 @@
   gap: 10px;
 }
 
-.btn-buy { background-color: #08b981; }
-.btn-buy:hover { background-color: #05a06e; }
-.btn-sell { background-color: #f43f5e; }
-.btn-sell:hover { background-color: #e11d48; }
+.btn-buy { background-color: #10b981; color: #fff; }
+.btn-buy:hover { background-color: #059669; }
+.btn-sell { background-color: #f43f5e; color: #fff; }
+.btn-sell:hover { background-color: #dc2626; }
 
 .warning-banner {
   color: #f59e0b;
-  font-size: 10px;
+  font-size: 9px;
   text-align: center;
-  border-top: 1.5px solid #2a2e39;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   padding: 6px;
-  background-color: #131722;
+  background: rgba(9, 11, 20, 0.4);
   font-weight: 500;
   letter-spacing: 0.3px;
 }

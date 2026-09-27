@@ -42,6 +42,10 @@
         </div>
       </div>
 
+      <div id="advisory-box" style="display:none; font-size:10px; line-height:1.4; padding:8px; background:rgba(0,0,0,0.25); border:1px dashed rgba(255,255,255,0.08); border-radius:6px; color:#cbd5e1; max-height:85px; overflow-y:auto; word-break:break-word;">
+        <i>💡 Advisor View:</i> <span id="kronos-explanation"></span>
+      </div>
+
       <button class="kronos-btn" id="btn-predict">Generate Kronos Forecast</button>
 
       <div class="kronos-btn-group">
@@ -154,7 +158,15 @@
         let sigColor = data.signal === "BUY" ? "#26a69a" : data.signal === "SELL" ? "#ef5350" : "#d1d4dc";
         document.getElementById('trade-signal').style.color = sigColor;
 
+        if (data.explanation) {
+          document.getElementById('advisory-box').style.display = 'block';
+          document.getElementById('kronos-explanation').textContent = data.explanation;
+        } else {
+          document.getElementById('advisory-box').style.display = 'none';
+        }
+
         drawCanvasPredict(data.history, data.prediction);
+        drawOverlayPredict(data.history, data.prediction, data.entry_price, data.take_profit, data.stop_loss, data.signal);
         refreshPortfolio();
       } else {
         alert("Forecast Failed: " + data.error);
@@ -268,5 +280,185 @@
     } catch(err) {
       alert("Failed to submit manual order");
     }
+  }
+
+  // Draw glowing forecast overlay on TradingView chart container
+  function drawOverlayPredict(history, prediction, entryPrice, takeProfit, stopLoss, signal) {
+    const containers = document.querySelectorAll('.chart-container, .chart-widget, .layout__area--center');
+    if (!containers || containers.length === 0) return;
+
+    const chartContainer = containers[0];
+
+    // Ensure relative positioning for absolute centering of child elements
+    const currentStyle = window.getComputedStyle(chartContainer);
+    if (currentStyle.position === 'static') {
+      chartContainer.style.position = 'relative';
+    }
+
+    let overlay = document.getElementById('kronos-chart-overlay');
+    if (!overlay) {
+      overlay = document.createElement('canvas');
+      overlay.id = 'kronos-chart-overlay';
+      overlay.style.position = 'absolute';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100%';
+      overlay.style.height = '100%';
+      overlay.style.pointerEvents = 'none';
+      overlay.style.zIndex = '5'; // Above TV candles but below sidebar
+      chartContainer.appendChild(overlay);
+    }
+
+    const ctx = overlay.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const width = chartContainer.clientWidth;
+    const height = chartContainer.clientHeight;
+
+    overlay.width = width * dpr;
+    overlay.height = height * dpr;
+    overlay.style.width = `${width}px`;
+    overlay.style.height = `${height}px`;
+    ctx.scale(dpr, dpr);
+
+    ctx.clearRect(0, 0, width, height);
+
+    // Position forecast details in the right-hand offset
+    const rightMargin = 140;
+    const startX = width - rightMargin;
+    const predLen = prediction.length;
+    const candleWidth = Math.max(3, (rightMargin - 20) / predLen);
+
+    const highs = prediction.map(p => p.high);
+    const lows = prediction.map(p => p.low);
+    const maxVal = Math.max(...highs, entryPrice, takeProfit);
+    const minVal = Math.min(...lows, entryPrice, stopLoss);
+    const range = maxVal - minVal || 1;
+
+    // Map price to local Y coordinates
+    const padY = 50;
+    const chartH = height - (padY * 2);
+    function priceToY(price) {
+      return padY + chartH - ((price - minVal) / range) * chartH;
+    }
+
+    // 1. Draw Historical Separator line
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.setLineDash([4, 4]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(startX, 10);
+    ctx.lineTo(startX, height - 10);
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '10px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto';
+    ctx.fillText('Forecast Boundary', startX - 100, 20);
+
+    // 2. Draw prediction candlesticks
+    ctx.setLineDash([]);
+    for (let i = 0; i < predLen; i++) {
+      let p = prediction[i];
+      let x = startX + (i * candleWidth) + candleWidth/2;
+
+      let yOpen = priceToY(p.open);
+      let yClose = priceToY(p.close);
+      let yHigh = priceToY(p.high);
+      let yLow = priceToY(p.low);
+
+      let isBull = p.close >= p.open;
+      let color = isBull ? 'rgba(74, 222, 128, 0.85)' : 'rgba(248, 113, 113, 0.85)';
+      ctx.strokeStyle = color;
+      ctx.fillStyle = isBull ? 'rgba(74, 222, 128, 0.25)' : 'rgba(248, 113, 113, 0.25)';
+      ctx.lineWidth = 1.2;
+
+      // Draw wick
+      ctx.beginPath();
+      ctx.moveTo(x, yHigh);
+      ctx.lineTo(x, yLow);
+      ctx.stroke();
+
+      // Draw body
+      let yTop = Math.min(yOpen, yClose);
+      let yBottom = Math.max(yOpen, yClose);
+      let bodyH = Math.max(yBottom - yTop, 2);
+
+      ctx.beginPath();
+      ctx.rect(x - candleWidth/3, yTop, (candleWidth/3)*2, bodyH);
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // 3. Draw horizontal target bands (TP / SL / Entry)
+    const yEntry = priceToY(entryPrice);
+    const yTp = priceToY(takeProfit);
+    const ySl = priceToY(stopLoss);
+
+    // Entry Line
+    ctx.strokeStyle = 'rgba(96, 165, 250, 0.5)'; // Blue
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    ctx.beginPath();
+    ctx.moveTo(0, yEntry);
+    ctx.lineTo(width, yEntry);
+    ctx.stroke();
+    ctx.fillStyle = '#60a5fa';
+    ctx.fillText(`Kronos Entry: ${entryPrice.toFixed(2)}`, 20, yEntry - 4);
+
+    // Take Profit Line
+    ctx.strokeStyle = 'rgba(52, 211, 153, 0.5)'; // Green
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    ctx.moveTo(0, yTp);
+    ctx.lineTo(width, yTp);
+    ctx.stroke();
+    ctx.fillStyle = '#34d399';
+    ctx.fillText(`Target Take-Profit (TP): ${takeProfit.toFixed(2)}`, 20, yTp - 4);
+
+    // Stop Loss Line
+    ctx.strokeStyle = 'rgba(248, 113, 113, 0.5)'; // Red
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    ctx.moveTo(0, ySl);
+    ctx.lineTo(width, ySl);
+    ctx.stroke();
+    ctx.fillStyle = '#f87171';
+    ctx.fillText(`Trailing Stop-Loss (SL): ${stopLoss.toFixed(2)}`, 20, ySl - 4);
+
+    // 4. Outlook indicator display HUD
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(14, 18, 30, 0.85)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+
+    // Draw status box in top left of chart area (compatible rounded rect)
+    const boxW = 200;
+    const boxH = 55;
+    const bx = 15;
+    const by = 40;
+    const br = 8;
+    ctx.beginPath();
+    ctx.moveTo(bx + br, by);
+    ctx.lineTo(bx + boxW - br, by);
+    ctx.arcTo(bx + boxW, by, bx + boxW, by + br, br);
+    ctx.lineTo(bx + boxW, by + boxH - br);
+    ctx.arcTo(bx + boxW, by + boxH, bx + boxW - br, by + boxH, br);
+    ctx.lineTo(bx + br, by + boxH);
+    ctx.arcTo(bx, by + boxH, bx, by + boxH - br, br);
+    ctx.lineTo(bx, by + br);
+    ctx.arcTo(bx, by, bx + br, by, br);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(`Kronos Forecast: ${signal}`, 25, 58);
+    ctx.fillStyle = signal === 'BUY' ? '#34d399' : (signal === 'SELL' ? '#f87171' : '#9ca3af');
+    ctx.font = '9px sans-serif';
+    ctx.fillText(`Directional bias target calculated.`, 25, 75);
+    ctx.fillStyle = '#71717a';
+    ctx.fillText(`Mock Trading Mode Live.`, 25, 87);
   }
 })();
