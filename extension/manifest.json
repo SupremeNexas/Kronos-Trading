@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Kronos TradingView Bridge",
+  "version": "1.0",
+  "description": "Overlay Kronos future candlesticks and auto paper trade on TradingView.com",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://localhost:7070/*",
+    "https://*.tradingview.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.tradingview.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ]
+}
