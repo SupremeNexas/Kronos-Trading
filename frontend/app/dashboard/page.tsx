@@ -117,7 +117,7 @@ export default function DashboardPage() {
                       cursor={{fill: '#1e293b'}} 
                       contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px'}}
                       itemStyle={{color: '#34d399'}}
-                      formatter={(val: number) => [`${val}%`, 'Performance']}
+                      formatter={(val: any) => [`${val}%`, 'Performance']}
                     />
                     <Bar dataKey="performance_pct" radius={[0, 4, 4, 0]}>
                       {sectors.map((entry: any, index: number) => (

@@ -54,7 +54,7 @@ export default function PortfolioPage() {
       ]);
       setAccount(accRes.data || accRes);
       // Depending on actual response shape from API, adjust accordingly:
-      const positionsData = posRes.data?.positions || posRes.positions || [];
+      const positionsData = posRes.data?.positions || posRes.data?.positions || [];
       setPositions(positionsData);
     } catch (err: any) {
       console.error(err);
@@ -93,13 +93,13 @@ export default function PortfolioPage() {
       };
 
       const res = await placeOrder(orderPayload);
-      if (res.data?.success || res.success) {
+      if (res.data?.success || res.data?.success) {
         setOrderStatus({ type: 'success', message: `Order placed: ${orderPayload.side} ${qty} ${orderPayload.symbol}` });
         setOrderForm({ symbol: '', side: 'BUY', quantity: '', order_type: 'MARKET', price: '' });
         // Refresh positions
         fetchData();
       } else {
-        setOrderStatus({ type: 'error', message: res.data?.error || res.error || 'Failed to place order' });
+        setOrderStatus({ type: 'error', message: res.data?.error || res.data?.error || 'Failed to place order' });
       }
     } catch (err: any) {
       setOrderStatus({ type: 'error', message: err.message || 'An error occurred while placing the order' });

@@ -144,7 +144,7 @@ export default function StockAnalysisPage({ params }: { params: Promise<{ symbol
                     contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px'}}
                     itemStyle={{color: ChartColor}}
                     labelStyle={{color: '#94a3b8', marginBottom: '4px'}}
-                    formatter={(val: number) => [`$${val.toFixed(2)}`, 'Close']}
+                    formatter={(val: any) => [`$${val.toFixed(2)}`, 'Close']}
                   />
                   <Area type="monotone" dataKey="close" stroke={ChartColor} strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
                 </AreaChart>

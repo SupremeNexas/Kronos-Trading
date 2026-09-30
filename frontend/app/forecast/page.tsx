@@ -348,7 +348,7 @@ export default function ForecastStudio() {
                     <Tooltip
                       contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '0.5rem', color: '#f8fafc' }}
                       itemStyle={{ color: '#cbd5e1' }}
-                      formatter={(value: any, name: string) => {
+                      formatter={(value: any, name: any) => {
                         if (name === "range") return null;
                         return [`$${Number(value).toFixed(2)}`, name.toUpperCase()];
                       }}

@@ -50,8 +50,8 @@ export default function BacktestPage() {
 
     try {
       const response = await runBacktest(symbol.toUpperCase(), "1d", horizon);
-      if (response && response.success && response.backtest) {
-        setResult(response.backtest);
+      if (response && response.data?.success && response.data?.backtest) {
+        setResult(response.data?.backtest);
       } else {
         setError("Failed to run backtest. Invalid response format.");
       }

@@ -57,8 +57,8 @@ export default function AIResearchAssistant() {
     setError(null);
     try {
       const res = await runResearch(symbol.toUpperCase());
-      if (res.success && res.report) {
-        setReport(res.report);
+      if (res.data?.success && res.data?.report) {
+        setReport(res.data?.report);
       } else {
         setError('Failed to generate research report.');
       }
@@ -75,8 +75,8 @@ export default function AIResearchAssistant() {
     setError(null);
     try {
       const res = await getLatestResearch(symbol.toUpperCase());
-      if (res.success && res.report) {
-        setReport(res.report);
+      if (res.data?.success && res.data?.report) {
+        setReport(res.data?.report);
       } else {
         setError('No recent report found or failed to load.');
       }
