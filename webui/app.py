@@ -1411,6 +1411,28 @@ def api_predict_tv():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/trading/confirm_trade', methods=['POST'])
+def api_trading_confirm_trade():
+    """Confirms a pending agent trade proposal."""
+    data = request.get_json() or {}
+    analysis_id = data.get('analysis_id')
+
+    if not analysis_id:
+        return jsonify({'success': False, 'error': 'Missing analysis_id'}), 400
+
+    try:
+        from webui.agents_engine.orchestrator import AgentEngineOrchestrator
+        orchestrator = AgentEngineOrchestrator(broker=broker, predictor=predictor)
+        result = orchestrator.confirm_trade(analysis_id)
+        if result.get('success'):
+            return jsonify(result)
+        else:
+            return jsonify(result), 400
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/agent_run', methods=['POST'])
 def api_agent_run():
     ensure_model_loaded()

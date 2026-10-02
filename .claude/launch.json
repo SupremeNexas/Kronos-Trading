@@ -11,8 +11,15 @@
       "port": 5173
     },
     {
+      "name": "kronos-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "frontend"],
+      "port": 3000,
+      "url": "http://localhost:3000"
+    },
+    {
       "name": "kronos-webui",
-      "runtimeExecutable": "python3",
+      "runtimeExecutable": "./.venv/bin/python3",
       "runtimeArgs": ["webui/app.py"],
       "port": 7070,
       "url": "http://localhost:7070"
