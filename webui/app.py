@@ -104,8 +104,9 @@ ensemble_forecast_engine = EnsembleForecastEngine()
 
 def ensure_model_loaded():
     global tokenizer, model, predictor
+    import os
     if predictor is None:
-        if MODEL_AVAILABLE:
+        if MODEL_AVAILABLE and os.environ.get("FORECAST_MODE", "mock").lower() == "ai":
             try:
                 model_config = AVAILABLE_MODELS['kronos-small']
                 tokenizer = KronosTokenizer.from_pretrained(model_config['tokenizer_id'])

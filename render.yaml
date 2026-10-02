@@ -17,4 +17,4 @@ services:
       - key: TRADING_MODE
         value: paper
       - key: FORECAST_MODE
-        value: ai
+        value: mock
