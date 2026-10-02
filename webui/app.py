@@ -106,7 +106,12 @@ def ensure_model_loaded():
     global tokenizer, model, predictor
     import os
     if predictor is None:
-        if MODEL_AVAILABLE and os.environ.get("FORECAST_MODE", "mock").lower() == "ai":
+        # Hard-override to mock to prevent HF timeouts/OOM on 512MB free tier
+        forecast_mode = os.environ.get("FORECAST_MODE", "mock").lower()
+        if os.environ.get("RENDER"):
+            forecast_mode = "mock"
+            
+        if MODEL_AVAILABLE and forecast_mode == "ai":
             try:
                 model_config = AVAILABLE_MODELS['kronos-small']
                 tokenizer = KronosTokenizer.from_pretrained(model_config['tokenizer_id'])
