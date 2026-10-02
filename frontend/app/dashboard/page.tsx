@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getMarketOverview, getMarketTrending, getNewsFeed } from '@/lib/api';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, Cell } from 'recharts';
-import { TrendingUp, TrendingDown, Clock, Activity, Target, ShieldAlert, BarChart3, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const [overview, setOverview] = useState<any>(null);
@@ -37,19 +36,17 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="flex h-screen items-center justify-center bg-[var(--surface-canvas)]">
+        <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[var(--color-smoke)] uppercase">Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950 text-red-400 p-6 text-center">
-        <div>
-          <ShieldAlert className="w-12 h-12 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Connection Error</h2>
-          <p>{error}</p>
+      <div className="flex h-screen items-center justify-center bg-[var(--surface-canvas)]">
+        <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[#ff4a4a] uppercase border border-[#ff4a4a] px-4 py-2">
+          {error}
         </div>
       </div>
     );
@@ -58,108 +55,90 @@ export default function DashboardPage() {
   const { indices = [], macro = {}, sectors = [] } = overview || {};
   const { gainers = [], losers = [], most_active = [] } = trending || {};
 
-  // Formatter for numbers
   const formatNumber = (num: number) => num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 p-6 pb-20">
-      <div className="max-w-7xl mx-auto space-y-6">
-        
-        {/* Header */}
-        <header className="flex justify-between items-end border-b border-slate-800 pb-4">
-          <div>
-            <h1 className="text-3xl font-bold">Market Dashboard</h1>
-            <p className="text-slate-400 flex items-center gap-2 mt-1">
-              <Clock size={14} /> Global Markets Overview
-              <span className="bg-emerald-900/50 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-800 ml-2">LIVE</span>
-            </p>
-          </div>
-          <Link href="/markets" className="text-emerald-400 hover:text-emerald-300 text-sm font-medium flex items-center gap-1">
-            Browse Markets <ArrowRight size={16} />
-          </Link>
-        </header>
+    <div className="min-h-screen bg-[var(--surface-canvas)] w-full flex flex-col items-center pb-[120px]">
+      <div className="w-full max-w-[var(--layout-page-max-width)] px-6 pt-[80px] space-y-[80px]">
 
-        {/* Top KPIs (Indices) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {indices.slice(0, 4).map((idx: any) => {
-            const isPos = idx.change >= 0;
-            return (
-              <div key={idx.symbol} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col justify-between hover:bg-slate-800/50 transition-colors">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-slate-400 text-sm font-medium">{idx.name}</span>
-                  <span className="text-xs bg-slate-800 px-2 py-1 rounded text-slate-300">{idx.symbol}</span>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold">{formatNumber(idx.price)}</div>
-                  <div className={`flex items-center text-sm mt-1 font-medium ${isPos ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {isPos ? <TrendingUp size={16} className="mr-1" /> : <TrendingDown size={16} className="mr-1" />}
-                    {isPos ? '+' : ''}{formatNumber(idx.change)} ({idx.change_pct}%)
+        {/* MARKET OVERVIEW Section */}
+        <section>
+          {/* Section Eyebrow Bracket */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)]">
+              [ MARKET OVERVIEW ]
+            </div>
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)]">
+              B 01
+            </div>
+          </div>
+
+          <h2 className="text-display-serif font-light text-[49px] leading-[1.05] tracking-[-1px] text-[var(--color-chalk)] mb-8">
+            Pulse of the <span className="italic text-[var(--color-signal-lime)]">Market.</span>
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-[20px]">
+            {/* INDEXES */}
+            {indices.slice(0, 4).map((idx: any) => {
+              const isPos = idx.change >= 0;
+              return (
+                <div key={idx.symbol} className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[32px] flex flex-col justify-between">
+                  <div className="flex justify-between items-start mb-6">
+                    <span className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)]">{idx.name}</span>
+                  </div>
+                  <div>
+                    <div className="text-code-mono text-[20px] font-normal text-[var(--color-chalk)] leading-none mb-2">{formatNumber(idx.price)}</div>
+                    <div className={`text-code-mono text-[11px] font-normal ${isPos ? 'text-[var(--color-signal-lime)]' : 'text-[var(--color-ash)]'}`}>
+                      {isPos ? '+' : ''}{formatNumber(idx.change)} ({idx.change_pct}%)
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Middle Row: Macro & Sectors */}
-          <div className="lg:col-span-2 space-y-6">
-            
-            {/* Sector Performance */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><BarChart3 size={18} className="text-blue-400"/> Sector Performance</h2>
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={sectors} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="sector" type="category" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} width={120} />
-                    <RechartsTooltip 
-                      cursor={{fill: '#1e293b'}} 
-                      contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px'}}
-                      itemStyle={{color: '#34d399'}}
-                      formatter={(val: any) => [`${val}%`, 'Performance']}
-                    />
-                    <Bar dataKey="performance_pct" radius={[0, 4, 4, 0]}>
-                      {sectors.map((entry: any, index: number) => (
-                        <Cell key={`cell-${index}`} fill={entry.performance_pct >= 0 ? '#10b981' : '#ef4444'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+        {/* MARKET BREADTH & TEMPERATURE */}
+        <section className="grid grid-cols-1 lg:grid-cols-3 gap-[20px]">
+          {/* Trending (Watchlist proxy) */}
+          <div className="lg:col-span-2 bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8">
+              [ WATCHLIST ]
             </div>
 
-            {/* Trending Tables */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <h3 className="font-bold text-emerald-400 mb-4 flex items-center gap-2"><Target size={16}/> Top Gainers</h3>
-                <div className="space-y-3">
-                  {gainers.map((stock: any) => (
-                    <Link href={`/stocks/${stock.symbol.toLowerCase()}`} key={stock.symbol} className="flex justify-between items-center group">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[40px]">
+              {/* Gainers */}
+              <div>
+                <h3 className="text-display-serif text-[20px] text-[var(--color-chalk)] mb-4">Top Gainers</h3>
+                <div className="space-y-[1px] bg-[var(--color-graphite)] border border-[var(--color-graphite)]">
+                  {gainers.slice(0, 5).map((stock: any) => (
+                    <Link href={`/stocks/${stock.symbol.toLowerCase()}`} key={stock.symbol} className="flex justify-between items-center bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] p-3 group border-b border-[var(--color-graphite)] last:border-b-0">
                       <div>
-                        <div className="font-bold group-hover:text-emerald-400 transition-colors">{stock.symbol}</div>
-                        <div className="text-xs text-slate-500">{stock.name}</div>
+                        <div className="text-ui-sans text-[13px] font-medium text-[var(--color-chalk)]">{stock.symbol}</div>
+                        <div className="text-ui-sans text-[11px] text-[var(--color-ash)] truncate w-32">{stock.name}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">{formatNumber(stock.price)}</div>
-                        <div className="text-xs text-emerald-400">+{stock.change_pct}%</div>
+                        <div className="text-code-mono text-[13px] text-[var(--color-chalk)]">{formatNumber(stock.price)}</div>
+                        <div className="text-code-mono text-[11px] text-[var(--color-signal-lime)]">+{stock.change_pct}%</div>
                       </div>
                     </Link>
                   ))}
                 </div>
               </div>
-              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-                <h3 className="font-bold text-red-400 mb-4 flex items-center gap-2"><Target size={16}/> Top Losers</h3>
-                <div className="space-y-3">
-                  {losers.map((stock: any) => (
-                    <Link href={`/stocks/${stock.symbol.toLowerCase()}`} key={stock.symbol} className="flex justify-between items-center group">
+
+              {/* Losers */}
+              <div>
+                <h3 className="text-display-serif text-[20px] text-[var(--color-chalk)] mb-4">Top Losers</h3>
+                <div className="space-y-[1px] bg-[var(--color-graphite)] border border-[var(--color-graphite)]">
+                  {losers.slice(0, 5).map((stock: any) => (
+                    <Link href={`/stocks/${stock.symbol.toLowerCase()}`} key={stock.symbol} className="flex justify-between items-center bg-[var(--surface-card)] hover:bg-[var(--surface-hover)] p-3 group border-b border-[var(--color-graphite)] last:border-b-0">
                       <div>
-                        <div className="font-bold group-hover:text-red-400 transition-colors">{stock.symbol}</div>
-                        <div className="text-xs text-slate-500">{stock.name}</div>
+                        <div className="text-ui-sans text-[13px] font-medium text-[var(--color-chalk)]">{stock.symbol}</div>
+                        <div className="text-ui-sans text-[11px] text-[var(--color-ash)] truncate w-32">{stock.name}</div>
                       </div>
                       <div className="text-right">
-                        <div className="font-medium">{formatNumber(stock.price)}</div>
-                        <div className="text-xs text-red-400">{stock.change_pct}%</div>
+                        <div className="text-code-mono text-[13px] text-[var(--color-chalk)]">{formatNumber(stock.price)}</div>
+                        <div className="text-code-mono text-[11px] text-[var(--color-ash)]">{stock.change_pct}%</div>
                       </div>
                     </Link>
                   ))}
@@ -168,76 +147,96 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Right Column: Macro & News */}
-          <div className="space-y-6">
-            
-            {/* Macro Stats */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2"><Activity size={18} className="text-purple-400"/> Macro Environment</h2>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-slate-950 rounded-lg">
-                  <div className="text-xs text-slate-500 mb-1">Fed Rate</div>
-                  <div className="font-bold">{macro.fed_funds_rate || 'N/A'}</div>
-                </div>
-                <div className="p-3 bg-slate-950 rounded-lg">
-                  <div className="text-xs text-slate-500 mb-1">10Y Yield</div>
-                  <div className="font-bold">{macro.us_10y_yield || 'N/A'}</div>
-                </div>
-                <div className="p-3 bg-slate-950 rounded-lg">
-                  <div className="text-xs text-slate-500 mb-1">VIX Index</div>
-                  <div className="font-bold">{macro.vix_volatility?.split(' ')[0] || 'N/A'}</div>
-                </div>
-                <div className="p-3 bg-slate-950 rounded-lg">
-                  <div className="text-xs text-slate-500 mb-1">DXY</div>
-                  <div className="font-bold">{macro.dollar_index_dxy || 'N/A'}</div>
-                </div>
-              </div>
-              <div className="mt-4 p-3 bg-slate-950 rounded-lg">
-                <div className="flex justify-between items-center text-xs text-slate-500 mb-2">
-                  <span>Sentiment Score</span>
-                  <span>{macro.market_sentiment_label}</span>
-                </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-emerald-500" 
-                    style={{ width: '100%' }}
-                  >
-                    <div className="relative w-full h-full">
-                      <div className="absolute top-0 bottom-0 w-1 bg-white" style={{ left: `${macro.market_sentiment_score}%` }}></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-center mt-1 text-sm font-bold">{macro.market_sentiment_score}/100</div>
-              </div>
+          {/* Macro / Risk */}
+          <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px] flex flex-col">
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8">
+              [ MACRO CONTEXT ]
             </div>
 
-            {/* News Feed */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-              <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-slate-200">Market Intelligence</h2>
-              <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {news.map((item: any) => {
-                  let badgeColors = "bg-slate-800 text-slate-300";
-                  if (item.sentiment === "BULLISH") badgeColors = "bg-emerald-900/30 text-emerald-400 border-emerald-800/50";
-                  if (item.sentiment === "BEARISH") badgeColors = "bg-red-900/30 text-red-400 border-red-800/50";
+            <div className="flex-1 space-y-6">
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <span className="text-ui-sans text-[12px] text-[var(--color-smoke)]">FED RATE</span>
+                <span className="text-code-mono text-[13px] text-[var(--color-chalk)]">{macro.fed_funds_rate || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <span className="text-ui-sans text-[12px] text-[var(--color-smoke)]">10Y YIELD</span>
+                <span className="text-code-mono text-[13px] text-[var(--color-chalk)]">{macro.us_10y_yield || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <span className="text-ui-sans text-[12px] text-[var(--color-smoke)]">VIX INDEX</span>
+                <span className="text-code-mono text-[13px] text-[var(--color-chalk)]">{macro.vix_volatility?.split(' ')[0] || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <span className="text-ui-sans text-[12px] text-[var(--color-smoke)]">DXY INDEX</span>
+                <span className="text-code-mono text-[13px] text-[var(--color-chalk)]">{macro.dollar_index_dxy || 'N/A'}</span>
+              </div>
 
-                  return (
-                    <div key={item.id} className="border-b border-slate-800/50 pb-4 last:border-0 last:pb-0">
-                      <div className="flex justify-between items-start mb-1 gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${badgeColors}`}>
-                          {item.sentiment}
-                        </span>
-                        <span className="text-xs text-slate-500 whitespace-nowrap">{item.time_ago}</span>
-                      </div>
-                      <h4 className="font-semibold text-sm leading-snug mb-1 hover:text-blue-400 cursor-pointer">{item.title}</h4>
-                      <p className="text-xs text-slate-400 line-clamp-2">{item.summary}</p>
-                    </div>
-                  );
-                })}
+              <div className="mt-8 pt-4">
+                <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-2">SENTIMENT</div>
+                <div className="text-display-serif text-[32px] text-[var(--color-chalk)]">
+                  {macro.market_sentiment_score || '--'}<span className="text-[16px] text-[var(--color-ash)]">/100</span>
+                </div>
+                <div className="text-ui-sans text-[12px] text-[var(--color-signal-lime)] mt-1 uppercase tracking-[0.1em]">{macro.market_sentiment_label || 'NEUTRAL'}</div>
               </div>
             </div>
-
           </div>
-        </div>
+        </section>
+
+        {/* LEADING INDUSTRIES / CHART */}
+        <section className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+          <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8">
+            [ SECTOR PERFORMANCE ]
+          </div>
+          <div className="h-[300px] w-full mt-8">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={sectors} margin={{ top: 5, right: 0, left: -20, bottom: 5 }}>
+                <YAxis type="number" stroke="var(--color-slate)" tick={{fill: 'var(--color-ash)', fontFamily: 'var(--font-jetbrains-mono)', fontSize: 10}} axisLine={false} tickLine={false} />
+                <XAxis dataKey="sector" type="category" stroke="var(--color-graphite)" tick={{fill: 'var(--color-ash)', fontFamily: 'var(--font-inter-tight)', fontSize: 11}} axisLine={false} tickLine={false} />
+                <RechartsTooltip
+                  cursor={{fill: 'var(--surface-hover)'}}
+                  contentStyle={{backgroundColor: 'var(--surface-raised)', borderColor: 'var(--color-slate)', color: 'var(--color-chalk)', borderRadius: '0px', fontFamily: 'var(--font-jetbrains-mono)', fontSize: '11px'}}
+                  itemStyle={{color: 'var(--color-signal-lime)'}}
+                  formatter={(val: any) => [`${val}%`, 'Alpha']}
+                />
+                <Bar dataKey="performance_pct" radius={[0, 0, 0, 0]}>
+                  {sectors.map((entry: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={entry.performance_pct >= 0 ? 'var(--color-smoke)' : 'var(--color-fog)'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+        {/* MARKET INTELLIGENCE / RESEARCH */}
+        <section className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+          <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8">
+            [ MARKET INTELLIGENCE · 01 ]
+          </div>
+          <h2 className="text-display-serif text-[40px] leading-[1.05] text-[var(--color-chalk)] mb-8 max-w-2xl">
+            Why is the market moving?
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-[40px]">
+            {news.slice(0, 4).map((item: any) => (
+              <div key={item.id} className="border-t border-[var(--color-graphite)] pt-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-ui-sans text-[10px] font-medium uppercase tracking-[0.18em] border border-[var(--color-slate)] px-2 py-1 text-[var(--color-smoke)]">
+                    {item.sentiment}
+                  </span>
+                  <span className="text-code-mono text-[11px] text-[var(--color-ash)]">{item.time_ago}</span>
+                </div>
+                <h4 className="text-ui-sans text-[16px] font-normal leading-[1.4] text-[var(--color-chalk)] mb-2 hover:text-[var(--color-signal-lime)] cursor-pointer transition-colors max-w-md">
+                  {item.title}
+                </h4>
+                <p className="text-ui-sans text-[14px] text-[var(--color-ash)] line-clamp-2 max-w-md">
+                  {item.summary}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
       </div>
     </div>
   );

@@ -3,8 +3,7 @@
 import { use } from 'react';
 import { useEffect, useState } from 'react';
 import { getMarketQuote, getMarketBars, getForecast } from '@/lib/api';
-import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts';
-import { TrendingUp, TrendingDown, Activity, AlertTriangle, ShieldCheck, Target, BarChart2 } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { format, parseISO } from 'date-fns';
 
 export default function StockAnalysisPage({ params }: { params: Promise<{ symbol: string }> }) {
@@ -21,13 +20,12 @@ export default function StockAnalysisPage({ params }: { params: Promise<{ symbol
     async function loadData() {
       try {
         setLoading(true);
-        // Load quote and bars for initial render
         const [quoteRes, barsRes] = await Promise.all([
           getMarketQuote(upperSymbol),
           getMarketBars(upperSymbol, '1d', 90)
         ]);
         setQuote(quoteRes.data);
-        
+
         let processedBars = [];
         if (barsRes.data.bars && barsRes.data.bars.length > 0) {
           processedBars = barsRes.data.bars.map((b: any) => ({
@@ -37,7 +35,6 @@ export default function StockAnalysisPage({ params }: { params: Promise<{ symbol
         }
         setBars(processedBars);
 
-        // Fire off forecast but don't block render
         getForecast(upperSymbol, '1d', 20).then(res => {
           setForecast(res.data);
         }).catch(err => {
@@ -58,226 +55,160 @@ export default function StockAnalysisPage({ params }: { params: Promise<{ symbol
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      <div className="flex h-screen items-center justify-center bg-[var(--surface-canvas)]">
+        <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[var(--color-smoke)] uppercase">Loading...</div>
       </div>
     );
   }
 
   if (error || !quote) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950 text-red-400 p-6">
-        <div className="text-center">
-          <AlertTriangle className="w-12 h-12 mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Error</h2>
-          <p>{error || "No data returned for this symbol."}</p>
+      <div className="flex h-screen items-center justify-center bg-[var(--surface-canvas)]">
+        <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[#ff4a4a] uppercase border border-[#ff4a4a] px-4 py-2">
+          {error || "No data returned for this symbol."}
         </div>
       </div>
     );
   }
 
   const isPos = quote.change >= 0;
-  const priceColor = isPos ? 'text-emerald-400' : 'text-red-400';
-  const ChartColor = isPos ? '#10b981' : '#ef4444';
+  const ChartColor = isPos ? 'var(--color-smoke)' : 'var(--color-fog)';
 
   const formatNum = (num: number) => num?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00';
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50 p-6 pb-20">
-      <div className="max-w-6xl mx-auto space-y-6">
-        
+    <div className="min-h-screen bg-[var(--surface-canvas)] w-full flex flex-col items-center pb-[120px]">
+      <div className="w-full max-w-[var(--layout-page-max-width)] px-6 pt-[80px] space-y-[80px]">
+
         {/* Header - Quote */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl font-extrabold">{upperSymbol}</h1>
-              <span className={`px-2 py-1 text-xs font-bold rounded ${quote.data_status === 'SIMULATED' ? 'bg-amber-900/40 text-amber-500 border border-amber-800' : 'bg-emerald-900/40 text-emerald-500 border border-emerald-800'}`}>
-                {quote.data_status || 'DELAYED'}
-              </span>
-            </div>
-            <div className="flex items-end gap-4 mt-2">
-              <span className="text-5xl font-mono tracking-tight">${formatNum(quote.price)}</span>
-              <div className={`flex items-center text-xl font-medium pb-1 ${priceColor}`}>
-                {isPos ? <TrendingUp size={24} className="mr-1" /> : <TrendingDown size={24} className="mr-1" />}
-                {isPos ? '+' : ''}{formatNum(quote.change)} ({quote.change_pct}%)
-              </div>
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)]">
+              [ STOCK ANALYSIS ]
             </div>
           </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 md:mt-0 w-full md:w-auto p-4 bg-slate-950 rounded-xl border border-slate-800">
-            <div>
-              <div className="text-slate-500 text-xs mb-1">Vol</div>
-              <div className="font-semibold">{quote.volume ? (quote.volume / 1000000).toFixed(2) + 'M' : '-'}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-xs mb-1">Open</div>
-              <div className="font-semibold">{formatNum(quote.open)}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-xs mb-1">High</div>
-              <div className="font-semibold">{formatNum(quote.high)}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-xs mb-1">Low</div>
-              <div className="font-semibold">{formatNum(quote.low)}</div>
-            </div>
+
+          <div className="flex flex-col md:flex-row justify-between items-start mb-8 gap-[40px]">
+             <div>
+                <h1 className="text-display-serif font-light text-[72px] leading-[0.98] tracking-[-1.8px] text-[var(--color-chalk)]">{upperSymbol}</h1>
+                <div className="text-ui-sans text-[14px] text-[var(--color-smoke)] mt-2">{quote.name || "COMPANY INC."}</div>
+             </div>
+             <div className="flex flex-row items-end gap-[40px]">
+                <div className="flex flex-col items-end">
+                   <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-smoke)] mb-2">CURRENT PRICE</div>
+                   <div className="text-code-mono text-[40px] text-[var(--color-chalk)] leading-none">${formatNum(quote.price)}</div>
+                </div>
+                <div className="flex flex-col items-end">
+                   <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-smoke)] mb-2">DAY CHANGE</div>
+                   <div className={`text-code-mono text-[20px] leading-none mb-1 ${isPos ? 'text-[var(--color-signal-lime)]' : 'text-[var(--color-ash)]'}`}>
+                      {isPos ? '+' : ''}{formatNum(quote.change)} ({quote.change_pct}%)
+                   </div>
+                </div>
+                <div className="flex flex-col items-end">
+                   <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-smoke)] mb-2">VOLUME</div>
+                   <div className="text-code-mono text-[20px] leading-none mb-1 text-[var(--color-chalk)]">
+                      {quote.volume ? (quote.volume / 1000000).toFixed(2) + 'M' : '-'}
+                   </div>
+                </div>
+             </div>
           </div>
-        </div>
+        </section>
 
         {/* Main Chart */}
-        <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-lg">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><BarChart2 className="text-blue-400"/> Price Action (90 Days)</h2>
-          <div className="h-80 w-full">
+        <section className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+          <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8">
+            [ PRICE ACTION ]
+          </div>
+          <div className="h-[400px] w-full">
             {bars.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={bars} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={ChartColor} stopOpacity={0.3}/>
+                      <stop offset="5%" stopColor={ChartColor} stopOpacity={0.1}/>
                       <stop offset="95%" stopColor={ChartColor} stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                  <XAxis dataKey="displayDate" tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} minTickGap={30} />
-                  <YAxis domain={['auto', 'auto']} tick={{fill: '#64748b', fontSize: 12}} axisLine={false} tickLine={false} orientation="right" />
-                  <RechartsTooltip 
-                    contentStyle={{backgroundColor: '#0f172a', borderColor: '#334155', color: '#f8fafc', borderRadius: '8px'}}
-                    itemStyle={{color: ChartColor}}
-                    labelStyle={{color: '#94a3b8', marginBottom: '4px'}}
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-graphite)" />
+                  <XAxis dataKey="displayDate" tick={{fill: 'var(--color-ash)', fontFamily: 'var(--font-jetbrains-mono)', fontSize: 10}} axisLine={false} tickLine={false} minTickGap={30} />
+                  <YAxis domain={['auto', 'auto']} tick={{fill: 'var(--color-ash)', fontFamily: 'var(--font-jetbrains-mono)', fontSize: 10}} axisLine={false} tickLine={false} orientation="right" />
+                  <RechartsTooltip
+                    contentStyle={{backgroundColor: 'var(--surface-raised)', borderColor: 'var(--color-slate)', color: 'var(--color-chalk)', borderRadius: '0px', fontFamily: 'var(--font-jetbrains-mono)', fontSize: '11px'}}
+                    itemStyle={{color: 'var(--color-signal-lime)'}}
+                    labelStyle={{color: 'var(--color-ash)', marginBottom: '4px', fontFamily: 'var(--font-inter-tight)'}}
                     formatter={(val: any) => [`$${val.toFixed(2)}`, 'Close']}
                   />
-                  <Area type="monotone" dataKey="close" stroke={ChartColor} strokeWidth={2} fillOpacity={1} fill="url(#colorPrice)" />
+                  <Area type="monotone" dataKey="close" stroke={ChartColor} strokeWidth={1} fillOpacity={1} fill="url(#colorPrice)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex h-full items-center justify-center text-slate-500">No chart data available.</div>
+              <div className="flex h-full items-center justify-center text-[var(--color-ash)] text-ui-sans text-[13px]">No chart data available.</div>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Forecast Section */}
-        <div className="bg-gradient-to-br from-slate-900 to-slate-950 p-6 rounded-2xl border border-slate-800 shadow-lg relative overflow-hidden">
-          {/* Subtle bg glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-          
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <h2 className="text-2xl font-bold flex items-center gap-2">
-              <Activity className="text-purple-400" /> AI Ensemble Forecast
-            </h2>
-            <div className="flex items-center gap-2 mt-2 md:mt-0 px-3 py-1 bg-slate-800 rounded-full border border-slate-700 text-xs text-slate-300">
-              <ShieldCheck size={14} className="text-blue-400"/>
-              Model Forecast — Not Financial Advice
+        <section className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+          <div className="flex items-center justify-between mb-8">
+            <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)]">
+              [ KRONOS FORECAST ]
             </div>
+            {forecast && (
+               <div className="px-[10px] py-[4px] rounded-full border border-[var(--color-signal-lime)] text-[var(--color-signal-lime)] text-ui-sans text-[11px] tracking-[0.06em] font-medium">
+                  ✓ MODEL ACTIVE
+               </div>
+            )}
           </div>
 
           {!forecast ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Activity className="w-10 h-10 text-emerald-500 animate-pulse mb-4" />
-              <p className="text-slate-400 animate-pulse">Running Ensemble Models (TimesFM + Chronos-2)...</p>
+              <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[var(--color-smoke)] uppercase">Running Models...</div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              {/* Target Tile */}
-              <div className="col-span-1 bg-slate-900 border border-slate-700/50 p-6 rounded-xl flex flex-col justify-between">
-                <div>
-                  <div className="text-sm text-slate-400 mb-1 font-medium">{forecast.horizon_bars} {forecast.interval} Target</div>
-                  <div className="text-4xl font-bold tracking-tight">${forecast.target_price}</div>
-                  <div className={`mt-2 font-bold ${forecast.expected_return_pct >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                    Exp Return: {forecast.expected_return_pct}%
-                  </div>
-                </div>
-                
-                <div className="mt-6">
-                  <div className="flex justify-between text-xs text-slate-400 mb-1">
-                    <span>Confidence Score</span>
-                    <span className="font-bold text-white">{forecast.confidence_pct}/100</span>
-                  </div>
-                  <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-500" style={{ width: `${forecast.confidence_pct}%` }} />
-                  </div>
-                  <div className="mt-4 flex items-center gap-2">
-                    <div className={`px-4 py-2 flex-grow text-center rounded-lg font-bold text-white shadow-lg ${
-                      forecast.direction === 'BULLISH' ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' :
-                      forecast.direction === 'BEARISH' ? 'bg-gradient-to-r from-red-600 to-red-400' :
-                      'bg-gradient-to-r from-slate-600 to-slate-400'
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[40px]">
+
+              {/* CURRENT */}
+              <div className="border-t border-[var(--color-graphite)] pt-[24px]">
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-4">CURRENT</div>
+                 <div className="text-code-mono text-[32px] text-[var(--color-chalk)] leading-none">${formatNum(forecast.current_price)}</div>
+              </div>
+
+              {/* TARGET */}
+              <div className="border-t border-[var(--color-graphite)] pt-[24px]">
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-4">MODEL FORECAST</div>
+                 <div className="text-code-mono text-[32px] text-[var(--color-chalk)] leading-none mb-2">${formatNum(forecast.target_price)}</div>
+                 <div className={`text-code-mono text-[13px] ${forecast.expected_return_pct >= 0 ? 'text-[var(--color-signal-lime)]' : 'text-[var(--color-ash)]'}`}>
+                    {forecast.expected_return_pct > 0 ? "+" : ""}{forecast.expected_return_pct.toFixed(2)}%
+                 </div>
+              </div>
+
+              {/* HORIZON / CONFIDENCE */}
+              <div className="border-t border-[var(--color-graphite)] pt-[24px]">
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-4">HORIZON</div>
+                 <div className="text-code-mono text-[32px] text-[var(--color-chalk)] leading-none mb-4">{forecast.horizon_bars}D</div>
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-1">CONFIDENCE</div>
+                 <div className="text-code-mono text-[13px] text-[var(--color-chalk)]">{forecast.confidence_pct}%</div>
+              </div>
+
+              {/* SCENARIOS */}
+              <div className="border-t border-[var(--color-graphite)] pt-[24px]">
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mb-4">ESTIMATED RANGE</div>
+                 <div className="text-code-mono text-[16px] text-[var(--color-chalk)] mb-2">
+                    ${formatNum(forecast.scenarios?.bear?.price)} — ${formatNum(forecast.scenarios?.bull?.price)}
+                 </div>
+                 <div className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] mt-4 mb-2">CONSENSUS</div>
+                 <div className={`text-ui-sans text-[11px] tracking-[0.1em] font-medium border px-2 py-1 inline-block ${
+                      forecast.direction === 'BULLISH' ? 'border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]' :
+                      forecast.direction === 'BEARISH' ? 'border-[var(--color-ash)] text-[var(--color-chalk)]' :
+                      'border-[var(--color-graphite)] text-[var(--color-smoke)]'
                     }`}>
-                      {forecast.direction}
-                    </div>
-                  </div>
-                </div>
+                    {forecast.direction}
+                 </div>
               </div>
 
-              {/* Scenarios Tile */}
-              <div className="col-span-1 bg-slate-900 border border-slate-700/50 p-6 rounded-xl">
-                <h3 className="font-bold mb-4 flex items-center gap-2"><Target size={18}/> Price Scenarios</h3>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-emerald-400 font-bold">Bull (P90)</span>
-                      <span>${forecast.scenarios?.bull?.price}</span>
-                    </div>
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full"><div className="h-full bg-emerald-500 rounded-full" style={{width: '90%'}}></div></div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-blue-400 font-bold">Base (P50)</span>
-                      <span>${forecast.scenarios?.base?.price}</span>
-                    </div>
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full"><div className="h-full bg-blue-500 rounded-full" style={{width: '50%'}}></div></div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-1">
-                      <span className="text-red-400 font-bold">Bear (P10)</span>
-                      <span>${forecast.scenarios?.bear?.price}</span>
-                    </div>
-                    <div className="w-full bg-slate-800 h-1.5 rounded-full"><div className="h-full bg-red-500 rounded-full" style={{width: '10%'}}></div></div>
-                  </div>
-                </div>
-                <div className="mt-6 pt-4 border-t border-slate-800 text-sm">
-                  <span className="text-slate-400">Model Agreement:</span> <span className="font-semibold">{forecast.model_agreement}</span>
-                </div>
-              </div>
-
-              {/* Technicals Tile */}
-              <div className="col-span-1 bg-slate-900 border border-slate-700/50 p-6 rounded-xl">
-                <h3 className="font-bold mb-4">Technical & Strategy</h3>
-                <div className="space-y-3 font-mono text-xs">
-                  <div className="flex justify-between p-2 bg-slate-950 rounded">
-                    <span className="text-slate-400">Trend</span>
-                    <span className={forecast.models?.technical?.trend === 'UP' ? 'text-emerald-400' : 'text-red-400'}>
-                      {forecast.models?.technical?.trend || 'N/A'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-slate-950 rounded">
-                    <span className="text-slate-400">RSI (14)</span>
-                    <span className={forecast.models?.technical?.rsi > 70 ? 'text-red-400' : forecast.models?.technical?.rsi < 30 ? 'text-emerald-400' : 'text-slate-200'}>
-                      {forecast.models?.technical?.rsi ? forecast.models?.technical?.rsi.toFixed(2) : 'N/A'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-slate-950 rounded">
-                    <span className="text-slate-400">MACD</span>
-                    <span className={(forecast.models?.technical?.macd || 0) > 0 ? 'text-emerald-400' : 'text-red-400'}>
-                      {forecast.models?.technical?.macd ? forecast.models?.technical?.macd.toFixed(2) : 'N/A'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-slate-950 rounded">
-                    <span className="text-slate-400">Regime</span>
-                    <span className="text-blue-400">{forecast.market_regime?.volatility || 'MODERATE'} VOL</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-slate-950 rounded border border-emerald-900 mt-2">
-                    <span className="text-slate-400">FinRL Action</span>
-                    <span className="font-bold text-white">{forecast.finrl_strategy?.action || 'HOLD'}</span>
-                  </div>
-                </div>
-              </div>
             </div>
           )}
-          
-          <div className="mt-6 text-center text-xs text-slate-500 border-t border-slate-800 pt-4">
-            AI-generated model forecasts are for analytical research only. Past performance does not guarantee future results.
-          </div>
-        </div>
+        </section>
 
       </div>
     </div>
