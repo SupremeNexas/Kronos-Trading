@@ -24,6 +24,7 @@ class InfowayMarketDataProvider(BaseMarketDataProvider):
     """
     def __init__(self):
         self.api_key = os.environ.get("INFOWAY_API_KEY", "")
+        logging.info(f"[DIAGNOSTICS] INFOWAY_API_KEY is present: {bool(self.api_key)}, length: {len(self.api_key)}")
         if INFOWAY_AVAILABLE:
             self.client = InfowayClient(api_key=self.api_key)
         else:
