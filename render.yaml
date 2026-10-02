@@ -3,7 +3,7 @@ services:
     name: kronos-trading-ai
     env: python
     region: oregon
-    plan: free
+    plan: standard
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 1 --threads 4 --timeout 180
     healthCheckPath: /health
@@ -13,8 +13,8 @@ services:
       - key: FLASK_ENV
         value: production
       - key: MARKET_DATA_PROVIDER
-        value: mock
+        value: alpaca
       - key: TRADING_MODE
         value: paper
       - key: FORECAST_MODE
-        value: mock
+        value: ai
