@@ -4,7 +4,7 @@ import numpy as np
 import json
 import plotly.graph_objects as go
 import plotly.utils
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 import sys
 import warnings
@@ -459,9 +459,11 @@ def create_prediction_chart(df, pred_df, lookback, pred_len, actual_df=None, his
 @app.route('/invest')
 @app.route('/invest/<symbol>')
 def index(symbol=None):
-    """Home page & Dedicated Trading Terminal View"""
-    initial_symbol = symbol.upper() if symbol else 'AAPL'
-    return render_template('index.html', initial_symbol=initial_symbol)
+    """Redirect to canonical KRONOS frontend"""
+    frontend_url = os.environ.get("FRONTEND_URL", "https://kronos-trading-frontend.vercel.app")
+    if symbol:
+        return redirect(f"{frontend_url}/invest/{symbol}")
+    return redirect(frontend_url)
 
 # ==================== SYSTEM HEALTH & STATUS ====================
 
