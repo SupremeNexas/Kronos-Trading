@@ -29,11 +29,57 @@ except ImportError:
     MODEL_AVAILABLE = False
     print("Warning: Kronos model cannot be imported, will use simulated data for demonstration")
 
+
+import os
+import sentry_sdk
+from flask import request
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+    print("✅ Sentry initialized")
+
+try:
+    from posthog import Posthog
+    POSTHOG_API_KEY = os.environ.get("POSTHOG_API_KEY", "")
+    POSTHOG_HOST = os.environ.get("POSTHOG_HOST", "https://app.posthog.com")
+    if POSTHOG_API_KEY:
+        posthog = Posthog(POSTHOG_API_KEY, host=POSTHOG_HOST)
+        print("✅ PostHog initialized")
+    else:
+        posthog = None
+except ImportError:
+    posthog = None
+
+def track_event(event_name, properties=None):
+    if posthog:
+        try:
+            # We use 'anonymous_user' for demo if not logged in
+            user_id = 'anonymous_user'
+            if properties and 'user_id' in properties:
+                user_id = properties['user_id']
+            # Sanitize secrets
+            safe_props = properties.copy() if properties else {}
+            for k in list(safe_props.keys()):
+                if 'key' in k.lower() or 'token' in k.lower() or 'password' in k.lower():
+                    safe_props[k] = "***"
+                    
+            posthog.capture(user_id, event_name, safe_props)
+        except Exception:
+            pass
+
 app = Flask(__name__)
+
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 from webui.data_fetcher import fetch_symbol_data
 from webui.broker_service import MockBrokerAdapter
+from webui.broker_service_alpaca import AlpacaBrokerAdapter, ALPACA_AVAILABLE
+import os
 from webui.market_data import MarketDataProvider
 from webui.ai_berkshire_engine import AIBerkshireEngine
 from webui.forecast_engine import EnsembleForecastEngine, detect_hardware_capabilities, BacktestEngine
@@ -47,7 +93,10 @@ except Exception as e:
     print(f"⚠️ Database initialization notice: {e}")
 
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'paper_portfolio.json')
-broker_adapter = MockBrokerAdapter(db_path)
+if ALPACA_AVAILABLE and os.environ.get("ALPACA_API_KEY"):
+    broker_adapter = AlpacaBrokerAdapter()
+else:
+    broker_adapter = MockBrokerAdapter(db_path)
 broker = broker_adapter
 market_provider = MarketDataProvider()
 berkshire_engine = AIBerkshireEngine()
@@ -686,6 +735,7 @@ def api_market_bars():
 @app.route('/api/market/search')
 def api_market_search():
     query = request.args.get('q', '')
+    track_event('symbol_searched', {'query': query})
     results = market_provider.search_symbols(query)
     return jsonify({"results": results})
 
@@ -725,6 +775,7 @@ def api_trading_place_order():
     if not symbol or quantity <= 0 or price <= 0:
         return jsonify({'success': False, 'error': 'Missing or invalid parameters: symbol, quantity, and price must be valid.'}), 400
 
+    track_event('paper_order_submitted', {'symbol': symbol, 'side': side, 'quantity': quantity})
     res = broker_adapter.place_order(
         symbol=symbol,
         side=side,
@@ -776,6 +827,7 @@ def api_forecast():
         horizon = int(request.args.get('horizon', 20))
 
     try:
+        track_event('prediction_generated', {'symbol': symbol, 'timeframe': interval, 'horizon': horizon})
         res = ensemble_forecast_engine.generate_forecast(symbol=symbol, interval=interval, horizon=horizon)
         return jsonify(res)
     except Exception as e:
@@ -789,6 +841,7 @@ def api_forecast():
 def api_research_run():
     data = request.get_json() or {}
     symbol = data.get('symbol', 'AAPL')
+    track_event('research_started', {'symbol': symbol})
     report = berkshire_engine.run_research(symbol)
     return jsonify({"success": True, "report": report})
 
@@ -893,7 +946,14 @@ def predict():
 
         # Load sequence data
         if symbol:
-            df = fetch_symbol_data(symbol, timeframe)
+            # df = fetch_symbol_data(symbol, timeframe)
+            bars_resp = market_provider.get_historical_bars(symbol, timeframe, limit=lookback+pred_len)
+            bars = bars_resp.get("bars", [])
+            df = pd.DataFrame(bars)
+            if not df.empty:
+                df['timestamps'] = pd.to_datetime(df['time'])
+                for col in ['open', 'high', 'low', 'close', 'volume']:
+                    df[col] = pd.to_numeric(df[col])
             if df.empty:
                 return jsonify({'error': f'Failed to fetch data for symbol: {symbol}'}), 400
             file_path = f"live://{symbol}:{timeframe}"
@@ -978,6 +1038,7 @@ def predict():
 
         # Run multi-agent suite beside the chart to back up levels if requested/needed
         agent_data = {}
+        track_event('analysis_started', {'symbol': symbol})
         target_symbol = symbol or "MOCK"
         try:
             from webui.agents_engine.orchestrator import AgentEngineOrchestrator
@@ -990,6 +1051,7 @@ def predict():
                 allow_trading=False
             )
             if agent_res.get("success"):
+                track_event('signal_generated', {'symbol': symbol, 'signal': agent_res["forecast"].get("signal")})
                 agent_data = {
                     "signal": agent_res["forecast"].get("signal", "HOLD"),
                     "expected_return": agent_res["forecast"].get("return_pct", 0.0),
@@ -1212,7 +1274,14 @@ def api_predict_tv():
 
     try:
         # Fetch real time data
-        df = fetch_symbol_data(symbol, timeframe)
+        # df = fetch_symbol_data(symbol, timeframe)
+        bars_resp = market_provider.get_historical_bars(symbol, timeframe, limit=400)
+        bars = bars_resp.get("bars", [])
+        df = pd.DataFrame(bars)
+        if not df.empty:
+            df['timestamps'] = pd.to_datetime(df['time'])
+            for col in ['open', 'high', 'low', 'close', 'volume']:
+                df[col] = pd.to_numeric(df[col])
         if len(df) < 50:
             return jsonify({'error': f'Insufficient historical bars retrieved ({len(df)}), need at least 50'}), 400
 
@@ -1391,8 +1460,13 @@ def api_indian_advisor():
     # Custom load data helper using our native Yahoo Finance downloader
     def fetch_historical_data_local(symbol):
         try:
-            from webui.data_fetcher import fetch_yahoo
-            df = fetch_yahoo(symbol, "1d")
+            bars_resp = market_provider.get_historical_bars(symbol, "1d", limit=300)
+            bars = bars_resp.get("bars", [])
+            df = pd.DataFrame(bars)
+            if not df.empty:
+                df['timestamps'] = pd.to_datetime(df['time'])
+                for col in ['open', 'high', 'low', 'close', 'volume']:
+                    df[col] = pd.to_numeric(df[col])
             if not df.empty and len(df) >= 60:
                 return df
         except Exception as e:
@@ -1520,8 +1594,13 @@ def api_run_proof_test():
 
     def fetch_test_data_local(symbol):
         try:
-            from webui.data_fetcher import fetch_yahoo
-            df = fetch_yahoo(symbol, "1d")
+            bars_resp = market_provider.get_historical_bars(symbol, "1d", limit=300)
+            bars = bars_resp.get("bars", [])
+            df = pd.DataFrame(bars)
+            if not df.empty:
+                df['timestamps'] = pd.to_datetime(df['time'])
+                for col in ['open', 'high', 'low', 'close', 'volume']:
+                    df[col] = pd.to_numeric(df[col])
             if not df.empty and len(df) >= 80:
                 return df
         except Exception as e:
