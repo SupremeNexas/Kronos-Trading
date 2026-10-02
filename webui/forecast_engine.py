@@ -405,11 +405,24 @@ class EnsembleForecastEngine:
         bars = bars_resp.get("bars", [])
 
         if not bars:
-            bars_resp = self.market_provider.get_historical_bars("AAPL", "1d", limit=300)
-            bars = bars_resp.get("bars", [])
+            return {
+                "success": False,
+                "error": f"NO_DATA or Unsupported symbol: Could not fetch historical bars for {symbol}.",
+                "status": "NO_DATA"
+            }
 
         quote = self.market_provider.get_quote(symbol)
-        current_price = float(quote.get("price", 185.50))
+        current_price = float(quote.get("price", 0.0))
+
+        if current_price == 0.0 and bars and 'close' in bars[-1]:
+            current_price = float(bars[-1]['close'])
+
+        if current_price == 0.0:
+            return {
+                "success": False,
+                "error": f"INSUFFICIENT_DATA: Current price for {symbol} is zero or invalid.",
+                "status": "INSUFFICIENT_DATA"
+            }
 
         # Run model adapters
         tf_res = self.timesfm_adapter.forecast(symbol, bars, horizon=horizon)

@@ -829,6 +829,8 @@ def api_forecast():
     try:
         track_event('prediction_generated', {'symbol': symbol, 'timeframe': interval, 'horizon': horizon})
         res = ensemble_forecast_engine.generate_forecast(symbol=symbol, interval=interval, horizon=horizon)
+        if isinstance(res, dict) and res.get("error"):
+            return jsonify(res), 400
         return jsonify(res)
     except Exception as e:
         import traceback
@@ -1109,7 +1111,11 @@ def predict():
                 })
 
         # Determine directional target
-        forecast_change = float(round((forecast_points[-1]['close'] - historical_candles[-1]['close']) / historical_candles[-1]['close'] * 100, 2))
+        last_hist_close = historical_candles[-1]['close']
+        if last_hist_close == 0:
+            forecast_change = 0.0
+        else:
+            forecast_change = float(round((forecast_points[-1]['close'] - last_hist_close) / last_hist_close * 100, 2))
         forecast_metadata = {
             "expected_move_pct": forecast_change,
             "outlook": "BULLISH" if forecast_change > 1.0 else ("BEARISH" if forecast_change < -1.0 else "NEUTRAL"),
