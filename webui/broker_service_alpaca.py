@@ -36,8 +36,8 @@ from webui.broker_service import RiskEngine, MockBrokerAdapter
 class AlpacaBrokerAdapter:
     def __init__(self):
         self.risk_engine = RiskEngine()
-        api_key = os.environ.get("ALPACA_API_KEY", "")
-        secret_key = os.environ.get("ALPACA_SECRET_KEY", "")
+        api_key = os.environ.get("ALPACA_API_KEY", "") or os.environ.get("APCA_API_KEY_ID", "")
+        secret_key = os.environ.get("ALPACA_SECRET_KEY", "") or os.environ.get("APCA_API_SECRET_KEY", "")
         
         # Enforce PAPER ONLY
         is_paper = os.environ.get("ALPACA_PAPER_TRADE", "true").lower() == "true"

@@ -93,10 +93,21 @@ except Exception as e:
     print(f"⚠️ Database initialization notice: {e}")
 
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'paper_portfolio.json')
-if ALPACA_AVAILABLE and os.environ.get("ALPACA_API_KEY"):
-    broker_adapter = AlpacaBrokerAdapter()
+is_prod = os.environ.get("RENDER") is not None
+
+if is_prod:
+    # Strictly enforce real brokerage (Alpaca) in production, fail gracefully if keys absent
+    if not ALPACA_AVAILABLE:
+        print("WARNING: Alpaca not installed, but running in production. Broker will fail.")
+        broker_adapter = None
+    else:
+        broker_adapter = AlpacaBrokerAdapter()
 else:
-    broker_adapter = MockBrokerAdapter(db_path)
+    # Local fallback logic
+    if ALPACA_AVAILABLE and (os.environ.get("ALPACA_API_KEY") or os.environ.get("APCA_API_KEY_ID")):
+        broker_adapter = AlpacaBrokerAdapter()
+    else:
+        broker_adapter = MockBrokerAdapter(db_path)
 broker = broker_adapter
 market_provider = MarketDataProvider()
 berkshire_engine = AIBerkshireEngine()
