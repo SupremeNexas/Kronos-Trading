@@ -52,17 +52,36 @@ class ExecutionDesk:
 
         # Actual execution logic (to Alpaca paper via broker_client)
         try:
-            if self.broker_client and plan.quantity > 0:
+            if self.broker_client and plan.quantity > 0 and plan.side in ["BUY", "SELL"]:
                 logger.info(f"Submitting to Alpaca PAPER: {plan.side} {plan.quantity} {plan.symbol}")
-                # Mock response for now, assume success
-                order_id = f"alpaca_paper_{uuid.uuid4().hex[:8]}"
-                return PaperOrderResult(
-                    order_id=order_id,
-                    status="FILLED",
-                    filled_quantity=plan.quantity,
-                    filled_price=plan.price_target,
-                    timestamp=datetime.datetime.now()
+                # Call broker to place order
+                result = self.broker_client.place_order(
+                    symbol=plan.symbol,
+                    side=plan.side,
+                    quantity=plan.quantity,
+                    order_type="MARKET",  # Or let the broker use limit
+                    time_in_force="DAY"
                 )
+
+                if result.get("success"):
+                    logger.info(f"Broker returned success: {result}")
+                    order_id = result.get("order", {}).get("order_id", f"alpaca_paper_{uuid.uuid4().hex[:8]}")
+                    return PaperOrderResult(
+                        order_id=order_id,
+                        status="FILLED",
+                        filled_quantity=plan.quantity,
+                        filled_price=plan.price_target,
+                        timestamp=datetime.datetime.now()
+                    )
+                else:
+                    return PaperOrderResult(
+                        order_id="FAILED",
+                        status="FAILED",
+                        filled_quantity=0.0,
+                        filled_price=None,
+                        error=result.get("error", "Unknown broker error"),
+                        timestamp=datetime.datetime.now()
+                    )
             else:
                 return PaperOrderResult(
                     order_id="NO_TRADE",

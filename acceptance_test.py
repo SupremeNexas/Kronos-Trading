@@ -70,11 +70,12 @@ def acceptance_test():
     print("\nEvidence from Journal:")
     evidence = {
         "market_timestamp": entry.get("market_data_timestamp"),
-        "prediction_decision": entry.get("prediction_decision"),
-        "forecast_uncertainty": entry.get("portfolio_target", {}).get("risk_constraints", {}).get("confidence_used", 0) if entry.get("portfolio_target") else "N/A",
-        "portfolio_target_weight": entry.get("portfolio_target", {}).get("target_weight", 0) if entry.get("portfolio_target") else "N/A",
-        "validation_passed": entry.get("validation_results", {}).get("verdict", "N/A") if entry.get("validation_results") else "N/A",
-        "order_state": entry.get("order_id")
+        "prediction_decision": entry.get("prediction_decision", entry.get("signal")),
+        "forecast_uncertainty": entry.get("portfolio_target", {}).get("risk_constraints", {}).get("confidence_used", 0) if entry.get("portfolio_target") else entry.get("confidence", "N/A"),
+        "portfolio_target_weight": entry.get("portfolio_target", {}).get("target_weight", 0) if entry.get("portfolio_target") else entry.get("position_sizing", {}).get("target_weight", "N/A"),
+        "validation_passed": entry.get("validation", {}).get("verdict", "N/A"),
+        "paper_order_id": entry.get("paper_order_id"),
+        "order_status": entry.get("order_status")
     }
     pprint(evidence)
 

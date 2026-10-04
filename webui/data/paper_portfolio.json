@@ -143,6 +143,21 @@
       "filled_quantity": 1.0,
       "avg_fill_price": 180.0,
       "idempotency_key": "ik_api_test_bdc382a1"
+    },
+    {
+      "order_id": "ORD-987BC34A",
+      "time": "2026-10-04T20:28:08.017930",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 59.93586818206178,
+      "order_type": "Market",
+      "price": 0.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Invalid price: $0.0. Order price must be positive.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_cee8f7fc1d7c"
     }
   ],
   "executions": [
