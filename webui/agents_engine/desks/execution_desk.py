@@ -53,12 +53,13 @@ class ExecutionDesk:
         # Actual execution logic (to Alpaca paper via broker_client)
         try:
             if self.broker_client and plan.quantity > 0 and plan.side in ["BUY", "SELL"]:
-                logger.info(f"Submitting to Alpaca PAPER: {plan.side} {plan.quantity} {plan.symbol}")
+                logger.info(f"Submitting to Alpaca PAPER: {plan.side} {plan.quantity} {plan.symbol} @ {plan.price_target}")
                 # Call broker to place order
                 result = self.broker_client.place_order(
                     symbol=plan.symbol,
                     side=plan.side,
                     quantity=plan.quantity,
+                    price=plan.price_target,
                     order_type="MARKET",  # Or let the broker use limit
                     time_in_force="DAY"
                 )
