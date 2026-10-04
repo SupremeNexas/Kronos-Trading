@@ -2208,9 +2208,9 @@ def api_lab_system_status():
         "today": {
             "predictions": len(entries),
             "trade_proposals": sum(1 for e in entries if e.get("user_confirmation")),
-            "open_positions": len(broker_positions),
+            "open_positions": len(broker_positions) if isinstance(broker_positions, list) else len(broker_positions) if isinstance(broker_positions, dict) else 0,
             "realized_pnl": realized_pnl,
-            "unrealized_pnl": sum(((p.get("current_price",0) - p.get("avg_entry_price",0))/p.get("avg_entry_price",1))*100 for p in broker_positions.values()) if broker_positions else 0,
+            "unrealized_pnl": sum(((p.get("current_price",0) - p.get("avg_entry_price",0))/p.get("avg_entry_price",1))*100 for p in (broker_positions.values() if isinstance(broker_positions, dict) else broker_positions)) if broker_positions else 0,
             "wins": wins,
             "losses": losses
         }
