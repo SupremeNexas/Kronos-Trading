@@ -1427,7 +1427,7 @@ def api_trading_confirm_trade():
     try:
         from webui.agents_engine.orchestrator import AgentEngineOrchestrator
         orchestrator = AgentEngineOrchestrator(broker=broker, predictor=predictor)
-        result = orchestrator.confirm_trade(analysis_id)
+        result = orchestrator.confirm_trade(analysis_id, confirm=data.get("confirm", True))
         if result.get('success'):
             return jsonify(result)
         else:
@@ -1729,6 +1729,440 @@ def serve_indian_report():
 def serve_outputs_md():
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return send_from_directory(root_path, 'outputs.md')
+
+# ============================================================================
+# QUANT VALIDATION & TRADING JOURNAL API ENDPOINTS
+# Implements the Claude Trading Guide standard validation pipeline
+# ============================================================================
+
+@app.route('/api/validation/gates', methods=['POST'])
+def api_validation_gates():
+    """Run 5-gate quant validation for a symbol."""
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1d')
+
+    try:
+        from webui.agents_engine.quant_validation import TradingGatekeeper
+        from webui.data_fetcher import fetch_symbol_data as fetch_data
+
+        df = fetch_data(symbol, timeframe)
+        if df.empty or len(df) < 30:
+            return jsonify({'error': f'Insufficient data for {symbol}'}), 400
+
+        bars = []
+        for _, row in df.iterrows():
+            bars.append({
+                "open": float(row["open"]),
+                "high": float(row["high"]),
+                "low": float(row["low"]),
+                "close": float(row["close"]),
+                "volume": float(row.get("volume", 0))
+            })
+
+        last_close = float(df["close"].iloc[-1])
+        entry_price = data.get('entry_price', last_close)
+        stop_price = data.get('stop_price', last_close * 0.95)
+        side = data.get('side', 'BUY')
+        signal = data.get('signal', 'BUY')
+        account_capital = data.get('account_capital', 100000.0)
+
+        # Try to get real account capital from broker
+        try:
+            account_capital = broker.get_balance()
+        except Exception:
+            pass
+
+        gatekeeper = TradingGatekeeper()
+        result = gatekeeper.evaluate_gates(
+            bars=bars,
+            signal=signal,
+            entry_price=entry_price,
+            stop_price=stop_price,
+            account_capital=account_capital,
+            data_timestamp=datetime.datetime.now().isoformat(),
+            n_trials=data.get('n_trials', 1),
+            side=side
+        )
+
+        track_event('validation_gates_run', {'symbol': symbol, 'verdict': result.get('verdict')})
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/walkforward', methods=['POST'])
+def api_validation_walkforward():
+    """Run walk-forward validation for a symbol."""
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1d')
+    n_folds = data.get('n_folds', 5)
+
+    try:
+        from webui.agents_engine.quant_validation import WalkForwardValidator
+        from webui.data_fetcher import fetch_symbol_data as fetch_data
+
+        df = fetch_data(symbol, timeframe)
+        if df.empty or len(df) < 60:
+            return jsonify({'error': f'Insufficient data for walk-forward ({len(df)} bars)'}), 400
+
+        closes = df['close'].values.astype(float)
+        validator = WalkForwardValidator()
+        result = validator.validate(closes, n_folds=n_folds)
+
+        track_event('walkforward_run', {'symbol': symbol, 'passed': result.get('passed')})
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/backtest-integrity', methods=['POST'])
+def api_validation_backtest_integrity():
+    """Run backtest integrity audit for a symbol."""
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1d')
+
+    try:
+        from webui.agents_engine.quant_validation import BacktestIntegrityAuditor
+        from webui.data_fetcher import fetch_symbol_data as fetch_data
+
+        df = fetch_data(symbol, timeframe)
+        if df.empty or len(df) < 20:
+            return jsonify({'error': f'Insufficient data for integrity audit'}), 400
+
+        bars = []
+        for _, row in df.iterrows():
+            bars.append({
+                "open": float(row["open"]),
+                "high": float(row["high"]),
+                "low": float(row["low"]),
+                "close": float(row["close"]),
+                "volume": float(row.get("volume", 0))
+            })
+
+        # Construct synthetic signals representing next-bar execution
+        signals = [{
+            "bar_index": len(bars) - 2,
+            "execution_bar_index": len(bars) - 1,
+            "symbol": symbol,
+            "quantity": 1
+        }]
+
+        auditor = BacktestIntegrityAuditor()
+        result = auditor.audit(
+            bars=bars,
+            signals=signals,
+            fees_applied=True,
+            slippage_applied=True,
+            train_end_idx=int(len(bars) * 0.7),
+            test_start_idx=int(len(bars) * 0.7)
+        )
+
+        track_event('integrity_audit_run', {'symbol': symbol, 'passed': result.get('passed')})
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/regime', methods=['POST'])
+def api_validation_regime():
+    """Run regime analysis for a symbol."""
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1d')
+
+    try:
+        from webui.agents_engine.quant_validation import RegimeAnalyzer
+        from webui.data_fetcher import fetch_symbol_data as fetch_data
+
+        df = fetch_data(symbol, timeframe)
+        if df.empty or len(df) < 80:
+            return jsonify({'error': f'Insufficient data for regime analysis ({len(df)} bars)'}), 400
+
+        closes = df['close'].values.astype(float)
+        analyzer = RegimeAnalyzer()
+        result = analyzer.analyze(closes, sma_period=data.get('sma_period', 50))
+
+        track_event('regime_analysis_run', {'symbol': symbol, 'robustness': result.get('robustness')})
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/multiple-testing', methods=['POST'])
+def api_validation_multiple_testing():
+    """Run deflated Sharpe ratio (multiple-testing correction)."""
+    data = request.get_json() or {}
+
+    try:
+        from webui.agents_engine.quant_validation import MultipleTestingCorrector
+
+        observed_sharpe = data.get('observed_sharpe', 1.0)
+        n_trials = data.get('n_trials', 1)
+        n_observations = data.get('n_observations', 252)
+        skewness = data.get('skewness', 0.0)
+        kurtosis = data.get('kurtosis', 3.0)
+
+        corrector = MultipleTestingCorrector()
+        result = corrector.deflated_sharpe(
+            observed_sharpe=observed_sharpe,
+            n_trials=n_trials,
+            n_observations=n_observations,
+            skewness=skewness,
+            kurtosis=kurtosis
+        )
+
+        track_event('multiple_testing_run', {'verdict': result.get('verdict')})
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/position-size', methods=['POST'])
+def api_validation_position_size():
+    """Calculate position sizing for a proposed trade."""
+    data = request.get_json() or {}
+
+    try:
+        from webui.agents_engine.quant_validation import PositionSizer
+
+        entry_price = data.get('entry_price')
+        stop_price = data.get('stop_price')
+        side = data.get('side', 'BUY')
+
+        if not entry_price or not stop_price:
+            return jsonify({'error': 'entry_price and stop_price are required'}), 400
+
+        # Get real account capital if possible
+        try:
+            account_capital = broker.get_balance()
+        except Exception:
+            account_capital = data.get('account_capital', 100000.0)
+
+        sizer = PositionSizer()
+        result = sizer.calculate(
+            account_capital=account_capital,
+            entry_price=float(entry_price),
+            stop_price=float(stop_price),
+            side=side,
+            risk_pct=data.get('risk_pct', 2.0),
+            max_portfolio_pct=data.get('max_portfolio_pct', 20.0)
+        )
+
+        return jsonify(result)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/journal', methods=['GET'])
+def api_journal():
+    """Get trading journal entries."""
+    symbol = request.args.get('symbol')
+    limit = int(request.args.get('limit', 50))
+
+    try:
+        from webui.agents_engine.trading_journal import TradingJournal
+        journal = TradingJournal()
+        entries = journal.get_entries(symbol=symbol, limit=limit)
+        return jsonify({'entries': entries, 'count': len(entries)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/journal/accuracy', methods=['GET'])
+def api_journal_accuracy():
+    """Get model accuracy report — answers 'was the model actually right?'"""
+    symbol = request.args.get('symbol')
+
+    try:
+        from webui.agents_engine.trading_journal import TradingJournal
+        journal = TradingJournal()
+        report = journal.get_accuracy_report(symbol=symbol)
+        return jsonify(report)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/journal/rejected', methods=['GET'])
+def api_journal_rejected():
+    """Get all rejected/blocked trades and why."""
+    try:
+        from webui.agents_engine.trading_journal import TradingJournal
+        journal = TradingJournal()
+        rejected = journal.get_rejected_trades_report()
+        return jsonify({'rejected': rejected, 'count': len(rejected)})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/health/monitor', methods=['GET', 'POST'])
+def api_health_monitor():
+    """Production health monitoring — returns CONTINUE/WARNING/HALT."""
+    symbol = request.args.get('symbol') or (request.get_json() or {}).get('symbol')
+
+    try:
+        from webui.agents_engine.quant_validation import ProductionHealthMonitor
+        monitor = ProductionHealthMonitor()
+
+        # Feed with recent journal trades if available
+        try:
+            from webui.agents_engine.trading_journal import TradingJournal
+            journal = TradingJournal()
+            entries = journal.get_entries(symbol=symbol, limit=50, outcome="PROFIT")
+            entries += journal.get_entries(symbol=symbol, limit=50, outcome="LOSS")
+
+            for entry in entries:
+                if entry.get("fill_price") and entry.get("exit_price"):
+                    monitor.record_trade(
+                        symbol=entry["symbol"],
+                        entry_price=entry["fill_price"],
+                        exit_price=entry["exit_price"],
+                        side=entry.get("signal", "BUY")
+                    )
+        except Exception:
+            pass
+
+        status = monitor.get_health_status(symbol=symbol)
+        track_event('health_monitor_check', {
+            'symbol': symbol or 'ALL',
+            'recommendation': status.get('recommendation')
+        })
+        return jsonify(status)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/health/status', methods=['GET'])
+def api_health_status():
+    """Quick health status: CONTINUE / WARNING / HALT."""
+    symbol = request.args.get('symbol')
+
+    try:
+        from webui.agents_engine.quant_validation import ProductionHealthMonitor
+        monitor = ProductionHealthMonitor()
+        status = monitor.get_health_status(symbol=symbol)
+        return jsonify({
+            'recommendation': status.get('recommendation', 'INSUFFICIENT_DATA'),
+            'halt_new_trades': status.get('halt_new_trades', False),
+            'reason': status.get('reason', 'No data'),
+            'trade_count': status.get('trade_count', status.get('metrics', {}).get('total_trades', 0))
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/validation/full-report', methods=['POST'])
+def api_validation_full_report():
+    """
+    Comprehensive validation report for a symbol.
+    Runs all validators and returns a unified result.
+    """
+    data = request.get_json() or {}
+    symbol = data.get('symbol', 'BTCUSD')
+    timeframe = data.get('timeframe', '1d')
+
+    try:
+        from webui.agents_engine.quant_validation import (
+            BacktestIntegrityAuditor, WalkForwardValidator,
+            MultipleTestingCorrector, RegimeAnalyzer,
+            RealisticCostCalculator, ProductionHealthMonitor
+        )
+        from webui.data_fetcher import fetch_symbol_data as fetch_data
+        import numpy as np_report
+
+        df = fetch_data(symbol, timeframe)
+        if df.empty or len(df) < 60:
+            return jsonify({'error': f'Insufficient data for full report ({len(df)} bars)'}), 400
+
+        closes = df['close'].values.astype(float)
+        bars = []
+        for _, row in df.iterrows():
+            bars.append({
+                "open": float(row["open"]),
+                "high": float(row["high"]),
+                "low": float(row["low"]),
+                "close": float(row["close"]),
+                "volume": float(row.get("volume", 0))
+            })
+
+        report = {}
+
+        # 1. Backtest Integrity
+        auditor = BacktestIntegrityAuditor()
+        signals = [{"bar_index": len(bars)-2, "execution_bar_index": len(bars)-1,
+                     "symbol": symbol, "quantity": 1}]
+        report['backtest_integrity'] = auditor.audit(
+            bars=bars, signals=signals, fees_applied=True, slippage_applied=True,
+            train_end_idx=int(len(bars)*0.7), test_start_idx=int(len(bars)*0.7)
+        )
+
+        # 2. Walk-Forward
+        wf = WalkForwardValidator()
+        report['walk_forward'] = wf.validate(closes, n_folds=5)
+
+        # 3. Multiple-Testing
+        returns = np_report.diff(closes) / closes[:-1]
+        if len(returns) > 1 and np_report.std(returns) > 0:
+            from webui.agents_engine.quant_validation import _sharpe
+            raw_sharpe = _sharpe(returns)
+        else:
+            raw_sharpe = 0.0
+        mt = MultipleTestingCorrector()
+        report['multiple_testing'] = mt.deflated_sharpe(
+            observed_sharpe=raw_sharpe, n_trials=1, n_observations=len(returns)
+        )
+
+        # 4. Regime Analysis
+        ra = RegimeAnalyzer()
+        report['regime_analysis'] = ra.analyze(closes)
+
+        # 5. Realistic Costs
+        costs = RealisticCostCalculator()
+        if len(returns) > 0:
+            report['realistic_costs'] = costs.apply_costs(
+                gross_returns=returns, n_trades=10, n_periods=len(returns)
+            )
+
+        # 6. Health Monitor
+        report['health_status'] = ProductionHealthMonitor().get_health_status(symbol=symbol)
+
+        # 7. Trading Journal accuracy
+        try:
+            from webui.agents_engine.trading_journal import TradingJournal
+            journal = TradingJournal()
+            report['journal_accuracy'] = journal.get_accuracy_report(symbol=symbol)
+            report['rejected_trades'] = journal.get_rejected_trades_report()
+        except Exception:
+            report['journal_accuracy'] = {'message': 'No journal data yet'}
+            report['rejected_trades'] = []
+
+        report['symbol'] = symbol
+        report['timestamp'] = datetime.datetime.now().isoformat()
+        report['paper_only'] = True
+
+        track_event('full_validation_report', {'symbol': symbol})
+        return jsonify(report)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7070))
