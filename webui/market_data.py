@@ -176,6 +176,63 @@ class InfowayMarketDataProvider(BaseMarketDataProvider):
             "timestamp": datetime.datetime.now().isoformat()
         }
 
+
+    def get_asset_context(self, symbol: str) -> Dict[str, Any]:
+        context = {
+            "company_overview": "NOT_AVAILABLE",
+            "valuation": "NOT_AVAILABLE",
+            "analyst_ratings": "NOT_AVAILABLE",
+            "stock_drivers": "NOT_AVAILABLE",
+            "sector_industry": "NOT_AVAILABLE",
+            "concept_context": "NOT_AVAILABLE"
+        }
+        if not self.client:
+            return context
+        infoway_sym = self._get_infoway_symbol(symbol)
+        market_type = self._determine_market_type(symbol)
+        if market_type == "stock":
+            try:
+                subclient = getattr(self.client, market_type)
+                try:
+                    context["company_overview"] = subclient.get_company_overview(infoway_sym) or "NOT_AVAILABLE"
+                except: pass
+                try:
+                    context["valuation"] = subclient.get_stock_valuation(infoway_sym) or "NOT_AVAILABLE"
+                except: pass
+                try:
+                    context["analyst_ratings"] = subclient.get_stock_ratings(infoway_sym) or "NOT_AVAILABLE"
+                except: pass
+                try:
+                    context["stock_drivers"] = subclient.get_stock_drivers(infoway_sym) or "NOT_AVAILABLE"
+                except: pass
+            except Exception as e:
+                logging.error(f"Infoway get_asset_context error: {e}")
+        return context
+
+    def get_market_context(self) -> Dict[str, Any]:
+        context = {
+            "market_breadth": "NOT_AVAILABLE",
+            "market_temperature": "NOT_AVAILABLE",
+            "leading_industries": "NOT_AVAILABLE",
+            "global_indexes": "NOT_AVAILABLE"
+        }
+        if not self.client:
+            return context
+        try:
+            subclient = getattr(self.client, "stock", None)
+            if subclient:
+                try: context["market_breadth"] = subclient.get_market_breadth() or "NOT_AVAILABLE"
+                except: pass
+                try: context["market_temperature"] = subclient.get_market_temperature() or "NOT_AVAILABLE"
+                except: pass
+                try: context["leading_industries"] = subclient.get_leading_industries() or "NOT_AVAILABLE"
+                except: pass
+                try: context["global_indexes"] = subclient.get_global_indexes() or "NOT_AVAILABLE"
+                except: pass
+        except Exception as e:
+            logging.error(f"Infoway get_market_context error: {e}")
+        return context
+
 class MarketDataProvider(BaseMarketDataProvider):
     """
     KRONOS Default Abstraction over specific providers.
@@ -193,3 +250,9 @@ class MarketDataProvider(BaseMarketDataProvider):
     def get_quote(self, symbol: str) -> Dict[str, Any]:
         return self.infoway.get_quote(symbol)
 
+
+    def get_asset_context(self, symbol: str) -> Dict[str, Any]:
+        return self.infoway.get_asset_context(symbol)
+        
+    def get_market_context(self) -> Dict[str, Any]:
+        return self.infoway.get_market_context()
