@@ -4,6 +4,17 @@ import datetime
 import logging
 import numpy as np
 import pandas as pd
+
+import uuid
+def get_device():
+    try:
+        import torch
+        if torch.cuda.is_available(): return "GPU"
+        if hasattr(torch.backends, 'mps') and torch.backends.mps.is_available(): return "MPS"
+    except:
+        pass
+    return "CPU"
+
 from typing import Dict, Any, List, Optional
 from webui.market_data import MarketDataProvider
 
@@ -262,8 +273,11 @@ class EnsembleForecastEngine:
 
         bullish, bearish, drivers = self._extract_factors(symbol, tech_res, asset_context)
         if len(drivers) == 0:
-            drivers.append("Broad market conditions")
-            drivers.append("Sector level systematic flows")
+            drivers.append("NOT_AVAILABLE")
+        if len(bullish) == 0:
+            bullish.append("NOT_AVAILABLE")
+        if len(bearish) == 0:
+            bearish.append("NOT_AVAILABLE")
             
         direction = kronos_res["direction"]
         
@@ -286,27 +300,31 @@ class EnsembleForecastEngine:
                 "market_regime": market_context
             },
             
+            # Additional Fields
+            "forecast_id": str(uuid.uuid4()),
+            "model_version": "Kronos-small",
+            "data_timestamp": bars[-1].get("time", "NOT_AVAILABLE") if bars else "NOT_AVAILABLE",
+            "inference_timestamp": datetime.datetime.now().isoformat(),
+
             # Explanation factors (Dynamic and data-driven)
             "bullish_factors": bullish,
             "bearish_factors": bearish,
             "key_drivers": drivers,
             "risk_factors": [
-                f"Elevated price volatility (ATR: {tech_res.get('atr', 'N/A')})",
-                "Unexpected macroeconomic shifts",
-                "Divergence between index components"
+                f"Elevated price volatility (ATR: {tech_res.get('atr', 'N/A')})" if tech_res.get('atr', 0) > 0 else "NOT_AVAILABLE"
             ],
             "missing_information": [k for k, v in asset_context.items() if v == "NOT_AVAILABLE"],
             "conditions_that_would_change_decision": [
-                f"Price closing definitively below {tech_res.get('sma20', 'recent moving average')}",
-                "Federal momentum policy shift",
-                "Broad sector rotation"
+                f"Price closing definitively below {tech_res.get('sma20', 'recent moving average')}" if tech_res.get('status') == 'REAL' else "NOT_AVAILABLE"
             ],
             
             # Model output structure
             "model_details": {
                 "KRONOS": {
-                    "status": "REAL",
-                    "execution": "LOCAL",
+                    "status": kronos_res["status"],
+                    "execution": "RENDER" if os.environ.get("RENDER") else "LOCAL",
+                    "inference_mode": "PRODUCTION" if os.environ.get("RENDER") else "DEVELOPMENT",
+                    "device": get_device(),
                     "horizon": horizon
                 },
                 "Infoway_Data": {
@@ -314,6 +332,9 @@ class EnsembleForecastEngine:
                 }
             },
             
+            # Compatibility structure for existing UI components
+            # Quantiles mapped accordingly
+
             # Compatibility structure for existing UI components
             # Quantiles mapped accordingly
             "probability_distribution": {
@@ -329,6 +350,12 @@ class EnsembleForecastEngine:
                 "p90": kronos_res["quantiles"]["p90"]
             }
         }
+        # Cleanup arrays for NOT_AVAILABLE single element if everything is NOT_AVAILABLE
+        for field in ["risk_factors", "conditions_that_would_change_decision"]:
+            payload[field] = [x for x in payload[field] if x and x != "NOT_AVAILABLE"]
+            if not payload[field]:
+                payload[field] = ["NOT_AVAILABLE"]
+
 
         self.forecast_cache[cache_key] = {
             "timestamp": now_ts,

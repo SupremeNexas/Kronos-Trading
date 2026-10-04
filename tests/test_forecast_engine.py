@@ -50,9 +50,20 @@ class TestForecastEngine(unittest.TestCase):
             self.assertIn("missing_information", res)
             self.assertIn("conditions_that_would_change_decision", res)
             
+            # Additional fields 
+            self.assertIn("forecast_id", res)
+            self.assertIn("model_version", res)
+            self.assertIn("data_timestamp", res)
+            self.assertIn("inference_timestamp", res)
+
             drivers = res["key_drivers"]
             # Assert they aren't just empty fallback
             self.assertTrue(len(drivers) > 0)
+            
+            # Check execution
+            self.assertIn("execution", res["model_details"]["KRONOS"])
+            self.assertIn("inference_mode", res["model_details"]["KRONOS"])
+            self.assertIn("device", res["model_details"]["KRONOS"])
 
     @patch('webui.forecast_engine.get_kronos_model')
     def test_missing_model_explicit_failure(self, mock_get_model):
@@ -71,21 +82,25 @@ class TestForecastEngine(unittest.TestCase):
             self.assertEqual(res["forecast_source"], "KRONOS")
             self.assertEqual(res["model_details"]["KRONOS"]["status"], "REAL")
 
-    def test_kronos_uses_asset_bars(self):
-        # 2. NVDA forecast uses NVDA bars. (Implicit because MarketDataProvider fetched for NVDA)
-        bars_nvda = self.market_provider.get_historical_bars("NVDA", "1d", limit=50)["bars"]
-        if not bars_nvda:
-            return  # Skip if API fails
-            
-        adapter = KronosRealAdapter()
-        res = adapter.forecast("NVDA", bars_nvda, horizon=10)
-        
-        if res.get("status") == "REAL":
-            target = res["target_price"]
-            last_price = float(bars_nvda[-1]["close"])
-            
-            # Meaningful change
-            self.assertTrue(abs(target - last_price) > 0.0)
+    def test_multiple_assets_independent_conditioning(self):
+        # Test AAPL, MSFT, NVDA, AMZN for independency and valid forecast ID
+        results = {}
+        for sym in ["AAPL", "MSFT", "NVDA", "AMZN"]:
+            bars_nvda = self.market_provider.get_historical_bars(sym, "1d", limit=50)["bars"]
+            if not bars_nvda:
+                continue 
+            adapter = KronosRealAdapter()
+            res = adapter.forecast(sym, bars_nvda, horizon=10)
+            if res.get("status") == "REAL":
+                target = res["target_price"]
+                last_price = float(bars_nvda[-1]["close"])
+                self.assertTrue(abs(target - last_price) > 0.0)
+                results[sym] = target
+
+        targets = list(results.values())
+        if len(targets) > 1:
+            # They should not all be identical
+            self.assertTrue(len(set(targets)) > 1)
 
     def test_synthetic_adapters_removed(self):
         # 4. Synthetic/random forecast adapters cannot appear as REAL.

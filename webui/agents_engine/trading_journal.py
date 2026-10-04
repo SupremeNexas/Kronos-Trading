@@ -111,17 +111,19 @@ class TradingJournal:
             cursor.execute(_adapt_query("""
                 INSERT INTO prediction_runs (
                     id, run_id, symbol, timeframe, forecast_horizon,
-                    model_name, forecast_direction, expected_return,
+                    model_name, model_version, forecast_direction, expected_return,
                     predicted_target, lower_bound, upper_bound, confidence,
-                    decision, validation_status, risk_status, data_timestamp
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    decision, validation_status, risk_status, data_timestamp,
+                    supporting_evidence
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """), (
-                entry_id, run_id, symbol.upper(), "1D", forecast.get("horizon", 14),
-                forecast.get("model", "KRONOS"), forecast.get("direction", "UNKNOWN"), 
+                forecast.get("forecast_id", entry_id), run_id, symbol.upper(), "1D", forecast.get("horizon", 14),
+                forecast.get("model", "KRONOS"), forecast.get("model_version", "Kronos-small-v1"), forecast.get("direction", "UNKNOWN"), 
                 forecast.get("expected_return_pct", 0.0), forecast.get("target_price", 0.0),
                 forecast.get("support", 0.0), forecast.get("resistance", 0.0), confidence,
                 signal.upper(), validation_results.get("verdict", "") if validation_results else "",
-                risk_result.get("status", "") if risk_result else "", market_data_timestamp
+                risk_result.get("status", "") if risk_result else "", forecast.get("data_timestamp", market_data_timestamp),
+                forecast.get("inference_timestamp", "")
             ))
             
             # also insert event
