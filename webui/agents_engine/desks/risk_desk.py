@@ -37,7 +37,7 @@ class RiskDesk:
         delta_notional = proposed_notional - current_notional
 
         # Check maximum single position (e.g. 20%)
-        if target.target_weight > 0.2:
+        if target.target_weight > 0.2 or target.target_weight < -0.2:
             return RiskDecision(
                 status="BLOCK",
                 decision="BLOCK",
@@ -45,14 +45,8 @@ class RiskDesk:
                 adjusted_quantity=0.0
             )
 
-        if delta_notional <= 0:
-            return RiskDecision(
-                status="ALLOW",
-                decision="REDUCE_OR_HOLD",
-                adjusted_quantity=0.0
-            )
+        adjusted_quantity = abs(delta_notional) / target.current_price if target.current_price > 0 else 0.0
 
-        adjusted_quantity = delta_notional / target.current_price if target.current_price > 0 else 0.0
 
         if delta_notional > self.cash_balance:
             adjusted_quantity = self.cash_balance / target.current_price

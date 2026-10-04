@@ -23,23 +23,7 @@ def acceptance_test():
 
     # We will instantiate orchestrator
     print("\n--- STAGE: Initialization ---")
-    orchestrator = AgentEngineOrchestrator(broker=broker, predictor=None)
-    orchestrator.forecast_desk.forecast = lambda *args, **kwargs: ForecastDistribution(
-        symbol="AAPL",
-        forecast_model="MOCK_TEST",
-        forecast_version="1.0",
-        timestamp=datetime.datetime.now(),
-        current_price=333.69,
-        horizon=14,
-        expected_return_pct=0.03,
-        median_return_pct=0.03,
-        lower_range=320.0,
-        upper_range=350.0,
-        uncertainty=0.01,
-        confidence=0.9,
-        directional_prob=0.8,
-        source_timestamp=datetime.datetime.now()
-    )
+    orchestrator = AgentEngineOrchestrator(broker=broker, predictor=predictor)
 
     symbol = "AAPL"
     print(f"Targeting symbol: {symbol}")

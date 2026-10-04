@@ -1,7 +1,7 @@
 import logging
 import json
 from webui.agents_engine.prompts import templates
-from webui.agents_engine.schemas import validation
+from webui.agents_engine.desk_schemas import validation
 from webui.agents_engine.config import AI_MAX_RETRIES
 
 logger = logging.getLogger(__name__)

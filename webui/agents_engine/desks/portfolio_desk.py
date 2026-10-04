@@ -21,9 +21,9 @@ class PortfolioDesk:
         self.current_positions = current_positions or {}
 
     def get_view(self, forecast: ForecastDistribution) -> InvestmentView:
-        if forecast.expected_return_pct > 0.01:
+        if forecast.expected_return_pct > 0.0005:
             sig = "BUY"
-        elif forecast.expected_return_pct < -0.01:
+        elif forecast.expected_return_pct < -0.0005:
             sig = "SELL"
         else:
             sig = "HOLD"
@@ -95,7 +95,7 @@ class PortfolioDesk:
 
         except Exception as e:
             logger.warning(f"skfolio optimization failed or yielded fallback: {e}")
-            target_weight = 0.2 if view.signal == "BUY" else 0.0
+            target_weight = 0.2 if view.signal == "BUY" else (-0.2 if view.signal == "SELL" else 0.0)
             return PortfolioTarget(
                 symbol=view.symbol,
                 target_weight=target_weight,

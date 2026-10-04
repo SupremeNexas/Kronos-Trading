@@ -207,9 +207,15 @@ class TestAgentsEngine(unittest.TestCase):
         self.assertTrue(res["success"])
         self.assertIn("analysis_id", res)
         self.assertIn("forecast", res)
-        self.assertIn("proposal", res)
-        self.assertIn("validation", res)
         self.assertIn("execution", res)
+        # Quant validation is now part of the pipeline
+        self.assertIn("quant_validation", res)
+        # If validation blocked the trade, proposal/validation keys may be absent
+        if res["quant_validation"].get("verdict") == "NO_TRADE":
+            self.assertEqual(res["execution"]["status"], "BLOCKED_BY_VALIDATION")
+        else:
+            self.assertIn("proposal", res)
+            self.assertIn("validation", res)
 
 if __name__ == "__main__":
     unittest.main()

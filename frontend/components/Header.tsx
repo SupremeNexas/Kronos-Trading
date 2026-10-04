@@ -10,7 +10,7 @@ const NAV_ITEMS = [
   { label: "ANALYSIS", href: "/analysis" },
   { label: "PREDICTIONS", href: "/forecast" },
   { label: "PORTFOLIO", href: "/portfolio" },
-  { label: "PAPER TRADING", href: "/paper-trading" },
+  { label: "TRADING LAB", href: "/paper-trading" },
   { label: "RISK", href: "/risk" },
   { label: "RESEARCH", href: "/research" },
 ];

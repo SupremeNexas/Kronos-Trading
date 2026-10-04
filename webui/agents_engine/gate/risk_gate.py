@@ -166,7 +166,7 @@ class KronosRiskGate:
                 if rr_ratio < self.min_risk_reward_ratio:
                     return {
                         "approved": False,
-                        "reason": f"Poor risk/reward profile. R:R ratio is {rr_ratio:.2fx} (Target min is {self.min_risk_reward_ratio:.2f}x).",
+                        "reason": f"Poor risk/reward profile. R:R ratio is {rr_ratio:.2f}x (Target min is {self.min_risk_reward_ratio:.2f}x).",
                         "adjusted_quantity": 0.0,
                         "risk_metrics": {
                             "risk_reward_ratio": rr_ratio,
