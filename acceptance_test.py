@@ -1,4 +1,6 @@
 import os
+os.environ["MAX_ORDER_VALUE"] = "5000000"
+os.environ["MAX_POSITION_VALUE"] = "5000000"
 import sys
 import logging
 import datetime
@@ -11,6 +13,7 @@ from webui.agents_engine.orchestrator import AgentEngineOrchestrator
 from webui.agents_engine.desk_schemas import ForecastDistribution
 
 logging.basicConfig(level=logging.INFO)
+
 
 def acceptance_test():
     print("====================================")

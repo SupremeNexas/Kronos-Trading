@@ -20,5 +20,4 @@ sentry-sdk>=1.39.0
 posthog>=3.3.1
 scipy>=1.11.0
 skfolio>=1.4.1
-nautilus_trader>=1.205.0
 pydantic>=2.0.0

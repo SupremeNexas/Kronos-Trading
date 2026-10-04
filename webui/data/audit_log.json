@@ -872,5 +872,81 @@
       "filled_quantity": 0.0,
       "idempotency_key": "ik_cee8f7fc1d7c"
     }
+  },
+  {
+    "timestamp": "2026-10-04T20:28:35.783783",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-E425CB6E",
+      "time": "2026-10-04T20:28:35.783343",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 59.93586818206178,
+      "order_type": "Market",
+      "price": 333.69000244140625,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Insufficient position quantity. Available to sell: 9.0, Requested: 59.93586818206178.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_b71b1f7df988"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T20:31:39.975044",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-705C663A",
+      "time": "2026-10-04T20:31:39.974679",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 166.8494698452236,
+      "order_type": "Market",
+      "price": 333.69000244140625,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Order value ($55,676.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_6361c5d63f32"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T20:32:17.203816",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-F16CB28F",
+      "time": "2026-10-04T20:32:17.203389",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 166.8494698452236,
+      "order_type": "Market",
+      "price": 333.69000244140625,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Order value ($55,676.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_bb8f0c2e3880"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T20:32:43.922850",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-96F6B2F9",
+      "time": "2026-10-04T20:32:43.922169",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 166.8494698452236,
+      "order_type": "Market",
+      "price": 333.69000244140625,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 166.8494698452236,
+      "avg_fill_price": 333.69000244140625,
+      "idempotency_key": "ik_1de5b978eaef"
+    }
   }
 ]

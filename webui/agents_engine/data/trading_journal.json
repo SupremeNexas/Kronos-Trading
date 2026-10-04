@@ -1416,6 +1416,306 @@
       },
       "confirmation_at": "2026-10-04T20:28:08.015754",
       "order_updated_at": "2026-10-04T20:28:08.019918"
+    },
+    {
+      "id": "jrn_1255ea2245e5",
+      "created_at": "2026-10-04T20:28:35.775218",
+      "market_data_timestamp": "2026-10-04T20:28:35.221128",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "SELL",
+        "expected_return_pct": -0.013761036499190433,
+        "target_price": 329.0980821383951,
+        "support": 295.8850208877754,
+        "resistance": 367.06718283517927,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.875,
+      "signal": "SELL",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 59.93586818206178,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 59.93586818206178
+      },
+      "user_confirmation": "CONFIRMED",
+      "paper_order_id": null,
+      "order_status": "FAILED: Insufficient position quantity. Available to sell: 9.0, Requested: 59.93586818206178.",
+      "fill_price": 0,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.38",
+        "opposing_evidence": "High uncertainty: 0.06",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "SELL",
+      "execution_plan": {
+        "id": "31e2d9d99bcf46309892a450d682250d",
+        "symbol": "AAPL",
+        "side": "SELL",
+        "quantity": 59.93586818206178,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T20:28:35.773149"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": -0.2,
+        "current_weight": 0.0,
+        "weight_delta": -0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.8746529967271941,
+          "fallback": true
+        }
+      },
+      "confirmation_at": "2026-10-04T20:28:35.781133",
+      "order_updated_at": "2026-10-04T20:28:35.784960"
+    },
+    {
+      "id": "jrn_65bbe71a5923",
+      "created_at": "2026-10-04T20:31:39.965812",
+      "market_data_timestamp": "2026-10-04T20:31:39.120197",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "BUY",
+        "expected_return_pct": 0.01059232828689526,
+        "target_price": 337.2245564933205,
+        "support": 309.25455916162986,
+        "resistance": 368.7490064943957,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.891,
+      "signal": "BUY",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 166.8494698452236,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 166.8494698452236
+      },
+      "user_confirmation": "CONFIRMED",
+      "paper_order_id": null,
+      "order_status": "FAILED: Order value ($55,676.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "fill_price": 0,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.55",
+        "opposing_evidence": "High uncertainty: 0.05",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "BUY",
+      "execution_plan": {
+        "id": "be4d9cc7b5de416a9030a930b8c57c13",
+        "symbol": "AAPL",
+        "side": "BUY",
+        "quantity": 166.8494698452236,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T20:31:39.962869"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": 0.2,
+        "current_weight": 0.0,
+        "weight_delta": 0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.890816973296135,
+          "fallback": true
+        }
+      },
+      "confirmation_at": "2026-10-04T20:31:39.972536",
+      "order_updated_at": "2026-10-04T20:31:39.976511"
+    },
+    {
+      "id": "jrn_eba224798254",
+      "created_at": "2026-10-04T20:32:17.194459",
+      "market_data_timestamp": "2026-10-04T20:32:16.613325",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "BUY",
+        "expected_return_pct": 0.0036275603556889142,
+        "target_price": 334.90048306535243,
+        "support": 309.71072910355656,
+        "resistance": 366.1388895610676,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.89,
+      "signal": "BUY",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 166.8494698452236,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 166.8494698452236
+      },
+      "user_confirmation": "CONFIRMED",
+      "paper_order_id": null,
+      "order_status": "FAILED: Order value ($55,676.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "fill_price": 0,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.46",
+        "opposing_evidence": "High uncertainty: 0.06",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "BUY",
+      "execution_plan": {
+        "id": "f15e46ff5371457da7745ae82e09601a",
+        "symbol": "AAPL",
+        "side": "BUY",
+        "quantity": 166.8494698452236,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T20:32:17.191546"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": 0.2,
+        "current_weight": 0.0,
+        "weight_delta": 0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.8896247368377278,
+          "fallback": true
+        }
+      },
+      "confirmation_at": "2026-10-04T20:32:17.200950",
+      "order_updated_at": "2026-10-04T20:32:17.204804"
+    },
+    {
+      "id": "jrn_26df572882d0",
+      "created_at": "2026-10-04T20:32:43.911620",
+      "market_data_timestamp": "2026-10-04T20:32:43.098722",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "BUY",
+        "expected_return_pct": 0.021071502486583862,
+        "target_price": 340.7213521575985,
+        "support": 303.80254308130577,
+        "resistance": 372.7520590211377,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.881,
+      "signal": "BUY",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 166.8494698452236,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 166.8494698452236
+      },
+      "user_confirmation": "CONFIRMED",
+      "paper_order_id": "ORD-96F6B2F9",
+      "order_status": "FILLED",
+      "fill_price": 333.69000244140625,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.67",
+        "opposing_evidence": "High uncertainty: 0.06",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "BUY",
+      "execution_plan": {
+        "id": "782a31711ae1467cae3da5e6d7b1a0c3",
+        "symbol": "AAPL",
+        "side": "BUY",
+        "quantity": 166.8494698452236,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T20:32:43.909242"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": 0.2,
+        "current_weight": 0.0,
+        "weight_delta": 0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.8814134964257735,
+          "fallback": true
+        }
+      },
+      "confirmation_at": "2026-10-04T20:32:43.919532",
+      "order_updated_at": "2026-10-04T20:32:43.924088"
     }
   ]
 }
