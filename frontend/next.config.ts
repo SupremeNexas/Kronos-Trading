@@ -5,12 +5,11 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   async rewrites() {
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:7070';
     return [
       {
         source: '/api/:path*',
-        destination: process.env.API_URL 
-          ? `${process.env.API_URL}/api/:path*`
-          : 'http://127.0.0.1:7070/api/:path*',
+        destination: `${apiUrl}/api/:path*`,
       },
     ]
   }
