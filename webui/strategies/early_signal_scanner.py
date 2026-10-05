@@ -64,7 +64,7 @@ class EarlySignalScanner:
             return [item["item"]["id"] for item in data["coins"]]
         return "UNKNOWN"
 
-    def scan_assets(self, coin_ids: List[str], manual_mentions: Dict[str, int] = None) -> List[Dict[str, Any]]:
+    def scan_assets(self, coin_ids: List[str], manual_mentions: Dict[str, int] = None, user_id: str = None) -> List[Dict[str, Any]]:
         if not self.api_key and os.environ.get("FLASK_ENV") != "development":
             # According to requirement, if production key is missing return clear error
             # We'll return an error object inside the array or raise Exception.
@@ -95,8 +95,8 @@ class EarlySignalScanner:
             result = self._scan_single_asset(coin_id, trending_coins, manual_mentions.get(coin_id, 0))
             results.append(result)
             
-        self._save_scan_history(results)
-        self._update_watchlist(results)
+        self._save_scan_history(results, user_id)
+        self._update_watchlist(results, user_id)
         
         return results
 
@@ -181,22 +181,22 @@ class EarlySignalScanner:
 
         return result
 
-    def _save_scan_history(self, results: List[Dict[str, Any]]):
+    def _save_scan_history(self, results: List[Dict[str, Any]], user_id: str = None):
         if not get_db_connection: return
         conn, _ = get_db_connection()
         cursor = conn.cursor()
-        sql = "INSERT INTO scanner_history (signal_scan_id, strategy_version, data_source, timestamp_at, asset, volume_ratio, attention_score, momentum_7d, score, decision, reasons) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        sql = "INSERT INTO scanner_history (user_id, signal_scan_id, strategy_version, data_source, timestamp_at, asset, volume_ratio, attention_score, momentum_7d, score, decision, reasons) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         
         for r in results:
             cursor.execute(_adapt_query(sql), (
-                r["signal_scan_id"], r["strategy_version"], r["data_source"], r["timestamp"],
+                user_id, r["signal_scan_id"], r["strategy_version"], r["data_source"], r["timestamp"],
                 r["asset"], str(r["volume_ratio"]), str(r["attention_score"]), str(r["momentum_7d"]),
                 r["score"], r["decision"], " | ".join(r["reasons"])
             ))
         conn.commit()
         conn.close()
 
-    def _update_watchlist(self, results: List[Dict[str, Any]]):
+    def _update_watchlist(self, results: List[Dict[str, Any]], user_id=None):
         if not get_db_connection: return
         conn, _ = get_db_connection()
         cursor = conn.cursor()
@@ -210,21 +210,21 @@ class EarlySignalScanner:
         
         for r in results:
             if r["decision"] == "WATCHLIST":
-                cursor.execute(_adapt_query("DELETE FROM scanner_watchlist WHERE asset = ?"), (r["asset"],))
-                sql = "INSERT INTO scanner_watchlist (asset, signal_scan_id, timestamp_at, volume_ratio, attention_score, momentum_7d, score, reasons) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+                cursor.execute(_adapt_query("DELETE FROM scanner_watchlist WHERE asset = ? AND user_id = ?"), (r["asset"], user_id))
+                sql = "INSERT INTO scanner_watchlist (user_id, asset, signal_scan_id, timestamp_at, volume_ratio, attention_score, momentum_7d, score, reasons) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 cursor.execute(_adapt_query(sql), (
-                    r["asset"], r["signal_scan_id"], r["timestamp"],
+                    user_id, r["asset"], r["signal_scan_id"], r["timestamp"],
                     str(r["volume_ratio"]), str(r["attention_score"]), str(r["momentum_7d"]),
                     r["score"], " | ".join(r["reasons"])
                 ))
         conn.commit()
         conn.close()
 
-    def get_scan_history(self) -> List[Dict[str, Any]]:
+    def get_scan_history(self, user_id=None) -> List[Dict[str, Any]]:
         if not get_db_connection: return []
         conn, _ = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(_adapt_query("SELECT signal_scan_id, timestamp_at, asset, volume_ratio, attention_score, momentum_7d, score, decision, reasons, data_source FROM scanner_history ORDER BY timestamp_at DESC LIMIT 100"))
+        cursor.execute(_adapt_query("SELECT signal_scan_id, timestamp_at, asset, volume_ratio, attention_score, momentum_7d, score, decision, reasons, data_source FROM scanner_history WHERE user_id = ? ORDER BY timestamp_at DESC LIMIT 100"), (user_id,))
         rows = cursor.fetchall()
         conn.close()
         
@@ -240,11 +240,11 @@ class EarlySignalScanner:
         # But now we do ORDER BY DESC.
         return res[::-1]
 
-    def get_watchlist(self) -> List[Dict[str, Any]]:
+    def get_watchlist(self, user_id=None) -> List[Dict[str, Any]]:
         if not get_db_connection: return []
         conn, _ = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute(_adapt_query("SELECT asset, signal_scan_id, timestamp_at, volume_ratio, attention_score, momentum_7d, score, reasons FROM scanner_watchlist ORDER BY timestamp_at DESC"))
+        cursor.execute(_adapt_query("SELECT asset, signal_scan_id, timestamp_at, volume_ratio, attention_score, momentum_7d, score, reasons FROM scanner_watchlist WHERE user_id = ? ORDER BY timestamp_at DESC"), (user_id,))
         rows = cursor.fetchall()
         conn.close()
         

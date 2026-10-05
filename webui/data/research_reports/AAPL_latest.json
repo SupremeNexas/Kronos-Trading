@@ -1,14 +1,14 @@
 {
-  "report_id": "res_aapl_20260927_131313",
+  "report_id": "res_aapl_20261004_214752",
   "symbol": "AAPL",
   "company_name": "Apple Inc.",
   "sector": "Consumer Electronics / Tech",
-  "timestamp": "2026-09-27T13:13:13.324157",
+  "timestamp": "2026-10-04T21:47:52.193596",
   "data_freshness": "LIVE / Updated Sep 2026",
   "overall_score": 4.0,
   "recommendation": "BUY / ACCUMULATE",
   "recommendation_color": "#059669",
-  "thesis_summary": "Apple Inc. demonstrates exceptional business quality (4.1/5) and financial health (4.4/5). With a Berkshire checklist score of 10/10, the company represents a high-conviction opportunity. Target Entry Range: $324.02 - $347.89.",
+  "thesis_summary": "Apple Inc. demonstrates exceptional business quality (4.1/5) and financial health (4.4/5). With a Berkshire checklist score of 10/10, the company represents a high-conviction opportunity. Target Entry Range: $171.0 - $183.6.",
   "checklist_passed_count": 10,
   "checklist_total": 10,
   "checklist": [
@@ -107,7 +107,7 @@
         "pb_ratio": 45.2,
         "ps_ratio": 7.8
       },
-      "intrinsic_value_est": 358.12,
+      "intrinsic_value_est": 189.0,
       "margin_of_safety_pct": 4.8,
       "buffett_verdict": "Consistent owner earnings and ROE. Balance sheet displays strong debt coverage. Margin of safety: 4.8%. Score: 4.4/5"
     },

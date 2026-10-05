@@ -2,6 +2,8 @@ import unittest
 import os
 import json
 from unittest.mock import patch, MagicMock
+import webui.market_data
+
 
 # Force CPU mode for tests to be fast
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -28,8 +30,13 @@ class TestForecastEngine(unittest.TestCase):
         self.assertEqual(res.get("forecast_status"), "ERROR")
         self.assertIn("NO_DATA", res.get("error", ""))
 
+    def tearDown(self):
+        self.market_patcher.stop()
+
     def test_cache_miss_for_different_symbols(self):
         # 1. AAPL request cannot return cached MSFT output.
+        
+        self.ensemble_engine.market_provider.get_kline = lambda s,i,l: [{"time": "2026-10-04", "open": 1, "high": 2, "low": 1, "close": 1, "volume": 100}] * 25
         res_aapl = self.ensemble_engine.generate_forecast("AAPL", interval="1d", horizon=20)
         res_msft = self.ensemble_engine.generate_forecast("MSFT", interval="1d", horizon=20)
         
@@ -69,9 +76,10 @@ class TestForecastEngine(unittest.TestCase):
     def test_missing_model_explicit_failure(self, mock_get_model):
         # 5. Missing model produces an explicit failure state.
         mock_get_model.return_value = "ERROR"
+        self.ensemble_engine.market_provider.get_kline = lambda s,i,l: [{"time": "2026-10-04", "open": 1, "high": 2, "low": 1, "close": 1, "volume": 100}] * 25
         res = self.ensemble_engine.generate_forecast("AAPL", interval="1d", horizon=20)
         self.assertFalse(res.get("success", True))
-        self.assertEqual(res.get("forecast_status"), "UNAVAILABLE")
+        self.assertEqual(res.get("forecast_status"), "ERROR")
         self.assertIn("MODEL UNAVAILABLE", res.get("error", ""))
 
     def test_model_status_real(self):

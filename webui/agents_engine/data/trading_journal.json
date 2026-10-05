@@ -1716,6 +1716,203 @@
       },
       "confirmation_at": "2026-10-04T20:32:43.919532",
       "order_updated_at": "2026-10-04T20:32:43.924088"
+    },
+    {
+      "id": "jrn_ef3057cfd721",
+      "created_at": "2026-10-04T21:37:42.037806",
+      "market_data_timestamp": "2026-10-04T21:37:41.321148",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "BUY",
+        "expected_return_pct": 0.0027775427434556213,
+        "target_price": 334.61684068625107,
+        "support": 308.479933832159,
+        "resistance": 367.42393813999456,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.886,
+      "signal": "BUY",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 5.993586818206178,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 5.993586818206178
+      },
+      "user_confirmation": "PENDING",
+      "paper_order_id": null,
+      "order_status": null,
+      "fill_price": null,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.48",
+        "opposing_evidence": "High uncertainty: 0.06",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "BUY",
+      "execution_plan": {
+        "id": "cc8986e113424c95af847a31db42aed3",
+        "symbol": "AAPL",
+        "side": "BUY",
+        "quantity": 5.993586818206178,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T21:37:42.037719"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": 0.2,
+        "current_weight": 0.0,
+        "weight_delta": 0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.885988505665922,
+          "fallback": true
+        }
+      }
+    },
+    {
+      "id": "jrn_828454990ac6",
+      "created_at": "2026-10-04T21:43:48.986932",
+      "market_data_timestamp": "2026-10-04T21:43:48.420888",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "SELL",
+        "expected_return_pct": -0.018079293649159875,
+        "target_price": 327.6571228994792,
+        "support": 296.7439499141755,
+        "resistance": 358.57031577653214,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.889,
+      "signal": "SELL",
+      "validation": {
+        "verdict": "PASS",
+        "all_gates_passed": true,
+        "gates": {}
+      },
+      "risk_result": {
+        "approved": true,
+        "adjusted_quantity": 166.85202311320816,
+        "reasons": [
+          "All risk checks passed"
+        ]
+      },
+      "position_sizing": {
+        "approved": true,
+        "position_size": 166.85202311320816
+      },
+      "user_confirmation": "PENDING",
+      "paper_order_id": null,
+      "order_status": null,
+      "fill_price": null,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.40",
+        "opposing_evidence": "High uncertainty: 0.06",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "SELL",
+      "execution_plan": {
+        "id": "098536689fbb41208d9b3caaafc1b4c8",
+        "symbol": "AAPL",
+        "side": "SELL",
+        "quantity": 166.85202311320816,
+        "price_target": 333.69000244140625,
+        "order_type": "MARKET",
+        "time_in_force": "GTC",
+        "validation_status": "PASS",
+        "risk_status": "ALLOW",
+        "proposal_timestamp": "2026-10-04T21:43:48.984693"
+      },
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": -0.2,
+        "current_weight": 0.0,
+        "weight_delta": -0.2,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "max_weight": 0.2,
+          "confidence_used": 0.8894147211309424,
+          "fallback": true
+        }
+      }
+    },
+    {
+      "id": "jrn_914a8370a869",
+      "created_at": "2026-10-04T21:47:29.163861",
+      "market_data_timestamp": "2026-10-04T21:47:28.810964",
+      "symbol": "AAPL",
+      "forecast": {
+        "direction": "HOLD",
+        "expected_return_pct": 8.875519747115367e-06,
+        "target_price": 333.69296411361233,
+        "support": 305.64891141770016,
+        "resistance": 361.11276218285155,
+        "model": "MOCK_PATHS",
+        "horizon": 0
+      },
+      "confidence": 0.895,
+      "signal": "HOLD",
+      "validation": {
+        "verdict": "NOT_EVALUATED",
+        "all_gates_passed": false,
+        "gates": {}
+      },
+      "risk_result": {},
+      "position_sizing": {},
+      "user_confirmation": "PENDING",
+      "paper_order_id": null,
+      "order_status": null,
+      "fill_price": null,
+      "exit_price": null,
+      "outcome": "PENDING",
+      "pnl_pct": null,
+      "model_correct": null,
+      "notes": "",
+      "evidence": {
+        "supporting_evidence": "Directional Prob: 0.50",
+        "opposing_evidence": "High uncertainty: 0.05",
+        "missing_information": "",
+        "conditions_that_would_change_decision": ""
+      },
+      "prediction_decision": "HOLD",
+      "execution_plan": null,
+      "portfolio_target": {
+        "symbol": "AAPL",
+        "target_weight": 0.0,
+        "current_weight": 0.0,
+        "weight_delta": 0.0,
+        "current_price": 333.69000244140625,
+        "risk_constraints": {
+          "reason": "No strong view or insufficient data"
+        }
+      }
     }
   ]
 }

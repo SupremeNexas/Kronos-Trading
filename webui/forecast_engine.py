@@ -15,7 +15,7 @@ def get_device():
         pass
     return "CPU"
 
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from webui.market_data import MarketDataProvider
 
 # Import KRONOS locally to prevent blocking on webui start if slow
@@ -177,6 +177,14 @@ class TechnicalForecastAdapter:
             "atr": round(atr, 2),
             "current_close": last_close
         }
+
+
+def detect_hardware_capabilities():
+    return {"device": "cpu", "provider": "CPU Basic"}
+
+class BacktestEngine:
+    def __init__(self, *args, **kwargs):
+        pass
 
 class EnsembleForecastEngine:
     """

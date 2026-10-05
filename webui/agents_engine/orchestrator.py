@@ -127,7 +127,8 @@ class AgentEngineOrchestrator:
         timeframe: str = "1d",
         pred_len: int = 14,
         allow_trading: bool = True,
-        analysis_id: Optional[str] = None
+        analysis_id: Optional[str] = None,
+        user_id: str = None
     ) -> Dict[str, Any]:
         """
         Executes a single workflow cycle via explicit Quant Desks. Returns overall result.
@@ -293,6 +294,7 @@ class AgentEngineOrchestrator:
                 }
 
             journal_id = self.trading_journal.record_prediction(
+                user_id=user_id,
                 symbol=flow_data["symbol"],
                 market_data_timestamp=snapshot.timestamp.isoformat(),
                 forecast={

@@ -214,8 +214,8 @@ class TestAgentsEngine(unittest.TestCase):
         if res["quant_validation"].get("verdict") == "NO_TRADE":
             self.assertEqual(res["execution"]["status"], "BLOCKED_BY_VALIDATION")
         else:
-            self.assertIn("proposal", res)
-            self.assertIn("validation", res)
+            self.assertIn("execution_plan", res)
+            self.assertIn("risk_validation", res)
 
 if __name__ == "__main__":
     unittest.main()

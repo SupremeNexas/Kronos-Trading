@@ -56,7 +56,7 @@ class TradingJournal:
                           signal: str,
                           validation_results: Optional[Dict[str, Any]] = None,
                           risk_result: Optional[Dict[str, Any]] = None,
-                          position_sizing: Optional[Dict[str, Any]] = None) -> str:
+                          position_sizing: Optional[Dict[str, Any]] = None, user_id: str = None) -> str:
         """
         Record a new prediction/signal entry. Returns the journal entry ID.
         """
@@ -110,14 +110,14 @@ class TradingJournal:
             cursor = conn.cursor()
             cursor.execute(_adapt_query("""
                 INSERT INTO prediction_runs (
-                    id, run_id, symbol, timeframe, forecast_horizon,
+                    id, user_id, run_id, symbol, timeframe, forecast_horizon,
                     model_name, model_version, forecast_direction, expected_return,
                     predicted_target, lower_bound, upper_bound, confidence,
                     decision, validation_status, risk_status, data_timestamp,
                     supporting_evidence
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """), (
-                forecast.get("forecast_id", entry_id), run_id, symbol.upper(), "1D", forecast.get("horizon", 14),
+                forecast.get("forecast_id", entry_id), user_id, run_id, symbol.upper(), "1D", forecast.get("horizon", 14),
                 forecast.get("model", "KRONOS"), forecast.get("model_version", "Kronos-small-v1"), forecast.get("direction", "UNKNOWN"), 
                 forecast.get("expected_return_pct", 0.0), forecast.get("target_price", 0.0),
                 forecast.get("support", 0.0), forecast.get("resistance", 0.0), confidence,

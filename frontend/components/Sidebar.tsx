@@ -1,6 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -30,24 +33,38 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Strategies", href: "/strategies", icon: Zap, badge: "New" },
-
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Markets", href: "/markets", icon: TrendingUp },
   { label: "Forecast", href: "/forecast", icon: Brain, badge: "AI" },
+  { label: "Strategies", href: "/strategies", icon: Zap, badge: "New" },
+  { label: "Terminal", href: "/terminal", icon: BarChart3 },
   { label: "Portfolio", href: "/portfolio", icon: Wallet },
+  { label: "My Stocks", href: "/my-stocks", icon: Diamond },
+  { label: "Trades", href: "/trades", icon: BarChart3 },
   { label: "Watchlist", href: "/watchlist", icon: Star },
-  { label: "Backtest", href: "/backtest", icon: BarChart3 },
   { label: "Research", href: "/research", icon: FileSearch },
+  { label: "Backtest", href: "/backtest", icon: BarChart3 },
   { label: "Alerts", href: "/alerts", icon: Bell },
+  { label: "Profile", href: "/profile", icon: ShieldCheck },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const [user, setUser] = useState<any>(null);
 
-  const isLinkActive = (href: string) => {
+  useEffect(() => {
+     axios.get('/api/auth/me', { withCredentials: true })
+        .then(res => setUser(res.data.user))
+        .catch(err => {
+            if (pathname !== '/login' && pathname !== '/register') {
+               window.location.href = '/login';
+            }
+        });
+  }, [pathname]);
+
+  const isLinkActive = (href: string) => { {
     if (href === "/dashboard" && (pathname === "/" || pathname === "/dashboard")) {
       return true;
     }

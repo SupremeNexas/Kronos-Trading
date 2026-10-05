@@ -948,5 +948,309 @@
       "avg_fill_price": 333.69000244140625,
       "idempotency_key": "ik_1de5b978eaef"
     }
+  },
+  {
+    "timestamp": "2026-10-04T21:38:03.747183",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-13E5C9E5",
+      "time": "2026-10-04T21:38:03.746680",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:38:03.750294",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-0B8F905A",
+      "time": "2026-10-04T21:38:03.750086",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:38:03.752153",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-6165AB11",
+      "time": "2026-10-04T21:38:03.751939",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:38:03.753123",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-79327E31",
+      "time": "2026-10-04T21:38:03.752901",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:38:06.273221",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-3EDB4D7D",
+      "time": "2026-10-04T21:38:06.270977",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Resulting position value ($210,212.90) would exceed MAX_POSITION_VALUE limit of $100,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_api_test_cbfe1b13"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:43:55.928261",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-224EB5F0",
+      "time": "2026-10-04T21:43:55.927668",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 0.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Invalid price: $0.0. Order price must be positive.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_5271610e9a95"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:47:49.856548",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-03BBBBFA",
+      "time": "2026-10-04T21:47:49.856254",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_dup_1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:47:49.859510",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-5F7472BB",
+      "time": "2026-10-04T21:47:49.859193",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_test_1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:47:49.861420",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-C6640601",
+      "time": "2026-10-04T21:47:49.861154",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 10,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 10,
+      "avg_fill_price": 180.0,
+      "idempotency_key": "ik_b1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:47:49.862440",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-C1718EF2",
+      "time": "2026-10-04T21:47:49.862162",
+      "symbol": "AAPL",
+      "side": "SELL",
+      "quantity": 5,
+      "order_type": "Market",
+      "price": 200.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 5,
+      "avg_fill_price": 200.0,
+      "idempotency_key": "ik_s1"
+    }
+  },
+  {
+    "timestamp": "2026-10-04T21:47:52.205581",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-9D64244E",
+      "time": "2026-10-04T21:47:52.203352",
+      "symbol": "AAPL",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 180.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Resulting position value ($210,212.90) would exceed MAX_POSITION_VALUE limit of $100,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_api_test_5c368610"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T13:35:48.201238",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-CE9B9A7D",
+      "time": "2026-10-05T13:35:48.199400",
+      "symbol": "BTC",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 0.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Invalid price: $0.0. Order price must be positive.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_6cd8e091ea68"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T13:35:59.546324",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-9A036B7A",
+      "time": "2026-10-05T13:35:59.545657",
+      "symbol": "BTC",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 0.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Invalid price: $0.0. Order price must be positive.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_75415727152f"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T13:36:23.786242",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-1A5C46CB",
+      "time": "2026-10-05T13:36:23.785545",
+      "symbol": "BTC",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 60000.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Order value ($60,000.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_7412d7dc6961"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T13:38:20.184421",
+    "action": "ORDER_REJECTED",
+    "details": {
+      "order_id": "ORD-885DA51D",
+      "time": "2026-10-05T13:38:20.182925",
+      "symbol": "BTC",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 60000.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Rejected",
+      "rejection_reason": "Order value ($60,000.00) exceeds configured MAX_ORDER_VALUE limit of $50,000.00.",
+      "filled_quantity": 0.0,
+      "idempotency_key": "ik_912500aa30bf"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T13:41:01.905027",
+    "action": "ORDER_EXECUTED",
+    "details": {
+      "order_id": "ORD-6E836B2C",
+      "time": "2026-10-05T13:41:01.864080",
+      "symbol": "BTC",
+      "side": "BUY",
+      "quantity": 1.0,
+      "order_type": "Market",
+      "price": 1000.0,
+      "trigger_price": 0.0,
+      "time_in_force": "DAY",
+      "status": "Filled",
+      "filled_quantity": 1.0,
+      "avg_fill_price": 1000.0,
+      "idempotency_key": "ik_5ddcfb7ff9b6"
+    }
   }
 ]
