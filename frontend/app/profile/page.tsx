@@ -69,7 +69,6 @@ export default function Profile() {
              <button onClick={changePassword} className="px-3 py-1 bg-[var(--color-signal-lime)]/20 text-[var(--color-signal-lime)] border border-[var(--color-signal-lime)]/50 hover:bg-[var(--color-signal-lime)]/30 text-xs text-bold">SAVE</button>
            </div>
          )}
-         </div>
       </div>
 
       <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-6">
