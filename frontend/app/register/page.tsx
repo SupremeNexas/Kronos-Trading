@@ -14,8 +14,20 @@ export default function Register() {
       if (res.data.success) {
          window.location.href = '/dashboard';
       }
-    } catch(err: any) {
-      alert(err.response?.data?.error || "Registration failed");
+        } catch(err: any) {
+      let errMsg = "Registration failed";
+      if (err.response && err.response.data) {
+        if (typeof err.response.data.error === 'string') {
+          errMsg = err.response.data.error;
+        } else if (typeof err.response.data === 'string') {
+          errMsg = err.response.data;
+        } else {
+          errMsg = JSON.stringify(err.response.data);
+        }
+      } else if (err.message) {
+        errMsg = err.message;
+      }
+      alert(errMsg);
     }
   };
 
