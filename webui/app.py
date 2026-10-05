@@ -701,6 +701,7 @@ def api_news_feed():
 # ==================== WATCHLIST & ALERTS API ====================
 
 @app.route('/api/watchlist', methods=['GET', 'POST', 'DELETE'])
+@login_required
 def api_watchlist():
     user = get_current_user()
     if not user: return jsonify({'success': False, 'error': 'Unauthorized'}), 401
@@ -728,6 +729,7 @@ def api_watchlist():
         return jsonify(res)
 
 @app.route('/api/alerts', methods=['GET', 'POST', 'DELETE'])
+@login_required
 def api_alerts():
     user = get_current_user()
     if not user: return jsonify({'success': False, 'error': 'Unauthorized'}), 401
@@ -805,6 +807,7 @@ def api_market_search():
     return jsonify({"results": results})
 
 @app.route('/api/trading/account')
+@login_required
 def api_trading_account():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
@@ -821,6 +824,7 @@ def api_trading_account():
     return jsonify(acc)
 
 @app.route('/api/trading/positions')
+@login_required
 def api_trading_positions():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
@@ -852,6 +856,7 @@ def api_trading_positions():
     return jsonify({"positions": my_positions})
 
 @app.route('/api/trading/orders')
+@login_required
 def api_trading_orders():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
@@ -866,6 +871,7 @@ def api_trading_orders():
     return jsonify({"orders": my_orders})
 
 @app.route('/api/trading/executions')
+@login_required
 def api_trading_executions():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
@@ -874,6 +880,7 @@ def api_trading_executions():
     return jsonify({"executions": []}) # Optional, can be derived from DB
 
 @app.route('/api/trading/place-order', methods=['POST'])
+@login_required
 def api_trading_place_order():
     data = request.get_json() or {}
     symbol = data.get('symbol')
@@ -920,8 +927,8 @@ def api_trading_place_order():
             INSERT INTO scanner_trades (
                 id, signal_scan_id, strategy, asset, signal_score, volume_ratio, 
                 attention_score, momentum_7d, decision, user_action, alpaca_order_id, 
-                fill_qty, position_size, outcome, timestamp_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                fill_qty, position_size, outcome, timestamp_at, user_id
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
             '''
             
             outcome_status = "PENDING" if res and res.get("success") else "REJECTED"
@@ -940,8 +947,7 @@ def api_trading_place_order():
                 alpaca_id,
                 float(order_info.get('filled_qty', 0)),
                 float(quantity if side.upper() == "BUY" else -quantity),
-                outcome_status
-            ))
+                outcome_status, user_id))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -954,6 +960,7 @@ def api_trading_place_order():
         return jsonify(res), 400
 
 @app.route('/api/trading/cancel-order', methods=['POST'])
+@login_required
 def api_trading_cancel_order():
     data = request.get_json() or {}
     order_id = data.get('order_id')
@@ -963,6 +970,7 @@ def api_trading_cancel_order():
     return jsonify(res)
 
 @app.route('/api/trading/kill-switch', methods=['POST'])
+@login_required
 def api_trading_kill_switch():
     data = request.get_json() or {}
     active = data.get('active', True)
@@ -1573,6 +1581,7 @@ def api_predict_tv():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/trading/confirm_trade', methods=['POST'])
+@login_required
 def api_trading_confirm_trade():
     """Confirms a pending agent trade proposal."""
     data = request.get_json() or {}
@@ -1595,6 +1604,7 @@ def api_trading_confirm_trade():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/agent_run', methods=['POST'])
+@login_required
 def api_agent_run():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
@@ -2624,6 +2634,7 @@ scanner_instance = EarlySignalScanner()
 
 
 @app.route('/api/scanner/scan', methods=['POST'])
+@login_required
 def api_scanner_scan():
     data = request.json or {}
     coin_ids = data.get("assets", [])
@@ -2631,7 +2642,8 @@ def api_scanner_scan():
     if not isinstance(coin_ids, list) or not coin_ids:
         return jsonify({"error": "assets array required"}), 400
         
-    results = scanner_instance.scan_assets(coin_ids, manual_mentions)
+    user = get_current_user()
+    results = scanner_instance.scan_assets(coin_ids, manual_mentions, user['id'])
     return jsonify(results)
 
 
@@ -2667,41 +2679,24 @@ def api_forecast_history():
 @login_required
 def api_scanner_history():
     user = get_current_user()
-    # Simple query for scanner history
-    conn, _ = get_db_connection()
-    cursor = conn.cursor()
     try:
-        cursor.execute(_adapt_query("SELECT signal_scan_id, asset, score, decision, timestamp_at, strategy_version FROM scanner_history WHERE user_id = ? ORDER BY timestamp_at DESC LIMIT 100"), (user['id'],))
-        history = []
-        for r in cursor.fetchall():
-            history.append({
-                "signal_scan_id": r[0],
-                "asset": r[1],
-                "score": r[2],
-                "decision": r[3],
-                "timestamp": str(r[4]) if r[4] else None,
-                "strategy_version": r[5]
-            })
-        return jsonify({"scanner_history": history})
-    finally:
-        conn.close()
+        res = scanner_instance.get_scan_history(user_id=user['id'])
+        return jsonify({"scanner_history": res})
+    except Exception as e:
+        return jsonify({"scanner_history": [], "error": str(e)})
 
 @app.route('/api/trading/trades', methods=['GET'])
 @login_required
 def api_trades():
     user = get_current_user()
-    # Fetch from orders / executions / paper_orders
     conn, _ = get_db_connection()
     cursor = conn.cursor()
     try:
-        # Simplistic mapping mostly fetching from `orders` and `executions` 
         cursor.execute(_adapt_query("""
-            SELECT o.created_at, o.symbol, o.order_type, o.side, o.quantity, 
-                   o.quantity, o.status, NULL, 
-                   o.price, o.id
-            FROM orders o
-            WHERE o.portfolio_id IN (SELECT id FROM portfolios WHERE user_id = ?)
-            ORDER BY o.created_at DESC LIMIT 100
+            SELECT timestamp_at, asset, strategy, user_action, position_size, decision, outcome, alpaca_order_id, signal_scan_id
+            FROM scanner_trades
+            WHERE user_id = ?
+            ORDER BY timestamp_at DESC LIMIT 100
         """), (user['id'],))
         
         res = []
@@ -2709,16 +2704,19 @@ def api_trades():
             res.append({
                 "date": str(r[0]),
                 "symbol": r[1],
-                "strategy": "MANUAL" if r[2] == "Market" else r[2],
-                "side": r[3],
-                "quantity": r[4],
-                "filled": r[5],
-                "status": r[6],
-                "alpaca_order_id": r[7],
-                "price": r[8],
-                "order_id": r[9]
+                "strategy": r[2] or "MANUAL",
+                "side": r[3] if r[3] else "UNKNOWN",
+                "quantity": abs(float(r[4])) if r[4] else 0.0,
+                "status": r[6] or "UNKNOWN",
+                "price": None, # Price ideally from alpaca execution or other storage
+                "alpaca_order_id": r[7] or "",
+                "signal_scan_id": r[8] or ""
             })
         return jsonify({"trades": res})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e), "trades": []})
     finally:
         conn.close()
 
@@ -2781,4 +2779,8 @@ def api_profile_patch():
 @login_required
 def api_scanner_watchlist():
     user = get_current_user()
-    return jsonify(scanner_instance.get_watchlist(user_id=user['id']))
+    try:
+        res = scanner_instance.get_watchlist(user_id=user['id'])
+        return jsonify({"watchlist": res})
+    except Exception as e:
+        return jsonify({"watchlist": [], "error": str(e)})

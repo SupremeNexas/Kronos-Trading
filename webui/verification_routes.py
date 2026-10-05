@@ -4,12 +4,11 @@ import json
 import uuid
 import datetime
 from flask import Blueprint, jsonify, request
-import db
+from webui.db import get_db_connection, IS_POSTGRES
+from webui.broker_service_alpaca import AlpacaBrokerAdapter, ALPACA_AVAILABLE
+import requests
+import traceback
 
-try:
-    import requests
-except ImportError:
-    pass
 
 verification_bp = Blueprint('verification', __name__)
 
@@ -204,11 +203,5 @@ def run_verification():
         results["error"] = str(e)
         results["traceback"] = traceback.format_exc()
 
-    # Save to history
-    history = load_history()
-    history.insert(0, results)
-    # Keep only last 20
-    save_history(history[:20])
-
-    return jsonify(results)
+    
 

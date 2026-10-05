@@ -67,6 +67,13 @@ def get_db_connection():
 
 # Shared schema DDL — compatible with both SQLite and PostgreSQL
 _TABLES_SQL_SQLITE = [
+    """CREATE TABLE IF NOT EXISTS user_sessions (
+        session_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        hashed_token TEXT NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
     """CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
@@ -119,6 +126,7 @@ _TABLES_SQL_SQLITE = [
         UNIQUE(portfolio_id, symbol)
     )""",
     """CREATE TABLE IF NOT EXISTS orders (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         portfolio_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -132,6 +140,7 @@ _TABLES_SQL_SQLITE = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS executions (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         order_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -192,6 +201,7 @@ _TABLES_SQL_SQLITE = [
         prediction_outcome TEXT
     )""",
     """CREATE TABLE IF NOT EXISTS trade_proposals (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         prediction_id TEXT NOT NULL,
         run_id TEXT NOT NULL,
@@ -212,6 +222,7 @@ _TABLES_SQL_SQLITE = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS paper_orders (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         trade_id TEXT NOT NULL,
         alpaca_order_id TEXT,
@@ -224,6 +235,7 @@ _TABLES_SQL_SQLITE = [
         filled_at TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS position_snapshots (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         snapshot_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -235,6 +247,7 @@ _TABLES_SQL_SQLITE = [
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         cash REAL,
@@ -249,6 +262,7 @@ _TABLES_SQL_SQLITE = [
         turnover REAL
     )""",
     """CREATE TABLE IF NOT EXISTS trading_events (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         run_id TEXT,
@@ -267,6 +281,7 @@ _TABLES_SQL_SQLITE = [
         trade_outcome TEXT
     )""",
     """CREATE TABLE IF NOT EXISTS daily_trading_journals (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         trading_day TEXT NOT NULL UNIQUE,
         predictions_count INTEGER,
@@ -287,6 +302,7 @@ _TABLES_SQL_SQLITE = [
 , 
     '''
     CREATE TABLE IF NOT EXISTS scanner_history (
+        user_id TEXT,
         signal_scan_id VARCHAR(255) PRIMARY KEY,
         strategy_version VARCHAR(50),
         data_source VARCHAR(255),
@@ -297,23 +313,27 @@ _TABLES_SQL_SQLITE = [
         momentum_7d VARCHAR(50),
         score INTEGER,
         decision VARCHAR(50),
-        reasons TEXT
+        reasons TEXT,
+        PRIMARY KEY(user_id, asset)
     )
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_watchlist (
-        asset VARCHAR(50) PRIMARY KEY,
+        user_id TEXT,
+        asset VARCHAR(50),
         signal_scan_id VARCHAR(255),
         timestamp_at TIMESTAMP,
         volume_ratio VARCHAR(50),
         attention_score VARCHAR(50),
         momentum_7d VARCHAR(50),
         score INTEGER,
-        reasons TEXT
+        reasons TEXT,
+        PRIMARY KEY(user_id, asset)
     )
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_trades (
+        user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),
         strategy VARCHAR(100),
@@ -334,6 +354,13 @@ _TABLES_SQL_SQLITE = [
 
 ]
 _TABLES_SQL_POSTGRES = [
+    """CREATE TABLE IF NOT EXISTS user_sessions (
+        session_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        hashed_token TEXT NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
     """CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
@@ -386,6 +413,7 @@ _TABLES_SQL_POSTGRES = [
         UNIQUE(portfolio_id, symbol)
     )""",
     """CREATE TABLE IF NOT EXISTS orders (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         portfolio_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -399,6 +427,7 @@ _TABLES_SQL_POSTGRES = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS executions (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         order_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -459,6 +488,7 @@ _TABLES_SQL_POSTGRES = [
         prediction_outcome TEXT
     )""",
     """CREATE TABLE IF NOT EXISTS trade_proposals (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         prediction_id TEXT NOT NULL,
         run_id TEXT NOT NULL,
@@ -479,6 +509,7 @@ _TABLES_SQL_POSTGRES = [
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS paper_orders (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         trade_id TEXT NOT NULL,
         alpaca_order_id TEXT,
@@ -491,6 +522,7 @@ _TABLES_SQL_POSTGRES = [
         filled_at TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS position_snapshots (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         snapshot_id TEXT NOT NULL,
         symbol TEXT NOT NULL,
@@ -502,6 +534,7 @@ _TABLES_SQL_POSTGRES = [
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )""",
     """CREATE TABLE IF NOT EXISTS portfolio_snapshots (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         cash DOUBLE PRECISION,
@@ -516,6 +549,7 @@ _TABLES_SQL_POSTGRES = [
         turnover DOUBLE PRECISION
     )""",
     """CREATE TABLE IF NOT EXISTS trading_events (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         run_id TEXT,
@@ -534,6 +568,7 @@ _TABLES_SQL_POSTGRES = [
         trade_outcome TEXT
     )""",
     """CREATE TABLE IF NOT EXISTS daily_trading_journals (
+        user_id TEXT,
         id TEXT PRIMARY KEY,
         trading_day TEXT NOT NULL UNIQUE,
         predictions_count BOOLEAN,
@@ -554,6 +589,7 @@ _TABLES_SQL_POSTGRES = [
 , 
     '''
     CREATE TABLE IF NOT EXISTS scanner_history (
+        user_id TEXT,
         signal_scan_id VARCHAR(255) PRIMARY KEY,
         strategy_version VARCHAR(50),
         data_source VARCHAR(255),
@@ -564,23 +600,27 @@ _TABLES_SQL_POSTGRES = [
         momentum_7d VARCHAR(50),
         score INTEGER,
         decision VARCHAR(50),
-        reasons TEXT
+        reasons TEXT,
+        PRIMARY KEY(user_id, asset)
     )
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_watchlist (
-        asset VARCHAR(50) PRIMARY KEY,
+        user_id TEXT,
+        asset VARCHAR(50),
         signal_scan_id VARCHAR(255),
         timestamp_at TIMESTAMP,
         volume_ratio VARCHAR(50),
         attention_score VARCHAR(50),
         momentum_7d VARCHAR(50),
         score INTEGER,
-        reasons TEXT
+        reasons TEXT,
+        PRIMARY KEY(user_id, asset)
     )
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_trades (
+        user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),
         strategy VARCHAR(100),
@@ -691,6 +731,76 @@ class DatabaseManager:
             )
 
             conn.commit()
+
+
+    @classmethod
+    def create_session(cls, user_id: str) -> str:
+        conn, _ = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            raw_token = secrets.token_hex(32)
+            hashed_token = hashlib.sha256(raw_token.encode()).hexdigest()
+            session_id = secrets.token_hex(16)
+            
+            now = datetime.datetime.utcnow()
+            expires_at = now + datetime.timedelta(days=7)
+            exp_str = expires_at.strftime("%Y-%m-%d %H:%M:%S")
+            
+            cursor.execute(_adapt_query(
+                "INSERT INTO user_sessions (session_id, user_id, hashed_token, expires_at) VALUES (?, ?, ?, ?)"
+            ), (session_id, user_id, hashed_token, exp_str))
+            
+            conn.commit()
+            return f"{session_id}:{raw_token}"
+        finally:
+            conn.close()
+
+    @classmethod
+    def get_user_from_session(cls, session_token: str) -> Optional[Dict]:
+        if not session_token or ":" not in session_token:
+            return None
+        session_id, raw_token = session_token.split(":", 1)
+        hashed_token = hashlib.sha256(raw_token.encode()).hexdigest()
+        
+        conn, _ = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(_adapt_query(
+                "SELECT user_id, expires_at FROM user_sessions WHERE session_id = ? AND hashed_token = ?"
+            ), (session_id, hashed_token))
+            row = cursor.fetchone()
+            if not row:
+                return None
+                
+            user_id, expires_at = row
+            if isinstance(expires_at, str):
+                # parse datetime
+                try:
+                    expires_at = datetime.datetime.strptime(expires_at, "%Y-%m-%d %H:%M:%S.%f")
+                except ValueError:
+                    expires_at = datetime.datetime.strptime(expires_at, "%Y-%m-%d %H:%M:%S")
+            
+            if expires_at < datetime.datetime.utcnow():
+                # expired
+                cls.delete_session(session_token)
+                return None
+                
+            return cls.get_user_by_id(user_id)
+        finally:
+            conn.close()
+
+    @classmethod
+    def delete_session(cls, session_token: str):
+        if not session_token or ":" not in session_token:
+            return
+        session_id, _ = session_token.split(":", 1)
+        conn, _ = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(_adapt_query("DELETE FROM user_sessions WHERE session_id = ?"), (session_id,))
+            conn.commit()
+        finally:
+            conn.close()
 
     # User Auth Operations
     @classmethod

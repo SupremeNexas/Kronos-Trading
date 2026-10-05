@@ -6,6 +6,7 @@ const api = axios.create({
   baseURL: API_BASE,
   timeout: 30000,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
 // Health
@@ -20,8 +21,8 @@ export const register = (email: string, password: string, name: string) =>
 
 export const loginDemo = () => api.post("/api/auth/demo");
 
-export const getMe = (userId: string) =>
-  api.get(`/api/auth/me?user_id=${userId}`);
+export const getMe = () =>
+  api.get(`/api/auth/me`);
 
 // Market
 export const getMarketOverview = () => api.get("/api/market/overview");
@@ -51,32 +52,30 @@ export const getLatestResearch = (symbol: string) =>
 export const getNewsFeed = () => api.get("/api/news/feed");
 
 // Watchlist
-export const getWatchlists = (userId: string) =>
-  api.get(`/api/watchlist?user_id=${userId}`);
-export const addWatchlistItem = (userId: string, symbol: string, name?: string) =>
-  api.post("/api/watchlist", { user_id: userId, symbol, name });
-export const removeWatchlistItem = (userId: string, symbol: string) =>
-  api.delete("/api/watchlist", { data: { user_id: userId, symbol } });
+export const getWatchlists = () =>
+  api.get(`/api/watchlist`);
+export const addWatchlistItem = (symbol: string, name?: string) =>
+  api.post("/api/watchlist", { symbol, name });
+export const removeWatchlistItem = (symbol: string) =>
+  api.delete("/api/watchlist", { data: { symbol } });
 
 // Alerts
-export const getAlerts = (userId: string) =>
-  api.get(`/api/alerts?user_id=${userId}`);
+export const getAlerts = () =>
+  api.get(`/api/alerts`);
 export const createAlert = (
-  userId: string,
   symbol: string,
   alertType: string,
   targetPrice: number,
   condition: string
 ) =>
   api.post("/api/alerts", {
-    user_id: userId,
     symbol,
     alert_type: alertType,
     target_price: targetPrice,
     condition,
   });
-export const deleteAlert = (userId: string, alertId: string) =>
-  api.delete("/api/alerts", { data: { user_id: userId, alert_id: alertId } });
+export const deleteAlert = (alertId: string) =>
+  api.delete("/api/alerts", { data: { alert_id: alertId } });
 
 // Portfolio
 export const getPortfolio = () => api.get("/api/portfolio");
