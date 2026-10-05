@@ -166,11 +166,11 @@ def run_verification():
         try:
             with db.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT count(*) FROM paper_orders WHERE api_order_id IS NOT NULL AND api_order_id != ''")
+                cursor.execute("SELECT count(*) FROM paper_orders WHERE alpaca_order_id IS NOT NULL AND alpaca_order_id != ''")
                 valid_orders = cursor.fetchone()[0]
                 if valid_orders > 0:
                     trace_feat["status"] = "VERIFIED"
-                    cursor.execute("SELECT symbol, side, qty, api_order_id FROM paper_orders WHERE api_order_id IS NOT NULL ORDER BY created_at DESC LIMIT 1")
+                    cursor.execute("SELECT symbol, side, qty, alpaca_order_id FROM paper_orders WHERE alpaca_order_id IS NOT NULL ORDER BY created_at DESC LIMIT 1")
                     last_ord = cursor.fetchone()
                     trace_feat["evidence"]["latest_order"] = f"{last_ord[1]} {last_ord[2]} {last_ord[0]} [ID: {last_ord[3]}]"
                     trace_feat["evidence"]["trace"] = "scanner->ui->submit->alpaca->db"
