@@ -73,8 +73,43 @@ def track_event(event_name, properties=None):
             pass
 
 app = Flask(__name__)
+try:
+    from flask_cors import CORS
+    CORS(app, supports_credentials=True)
+except ImportError:
+    pass
 
-CORS(app, resources={r"/*": {"origins": "*"}})
+
+from flask import request, jsonify, make_response
+from webui.db import DatabaseManager, get_db_connection, _adapt_query
+
+def get_current_user():
+    # First check cookies for http-only secure session
+    session_token = request.cookies.get('session_token')
+    if session_token:
+        user = DatabaseManager.get_user_from_session(session_token)
+        if user:
+            return user
+            
+    # Then check Auth Bearer token if API access
+    auth_header = request.headers.get('Authorization')
+    if auth_header and auth_header.startswith('Bearer '):
+        token = auth_header.split(' ', 1)[1]
+        user = DatabaseManager.get_user_from_session(token)
+        if user:
+            return user
+            
+    return None
+
+def login_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"success": False, "error": "Unauthorized"}), 401
+        return f(*args, **kwargs)
+    return decorated_function
 
 from webui.data_fetcher import fetch_symbol_data
 from webui.broker_service import MockBrokerAdapter
@@ -83,7 +118,7 @@ import os
 from webui.market_data import MarketDataProvider
 from webui.ai_berkshire_engine import AIBerkshireEngine
 from webui.forecast_engine import EnsembleForecastEngine, detect_hardware_capabilities, BacktestEngine
-from webui.db import DatabaseManager
+from webui.db import DatabaseManager, get_db_connection, _adapt_query
 
 # Initialize Database Schema
 try:
@@ -504,10 +539,17 @@ def api_auth_register():
     password = data.get('password', '').strip()
     name = data.get('name', '').strip()
 
-    if not email or not password or len(password) < 6:
+    if not email or len(password) < 6:
         return jsonify({"success": False, "error": "Valid email and password (min 6 characters) required"}), 400
 
     res = DatabaseManager.create_user(email=email, password=password, name=name or email.split('@')[0])
+    if res.get("success"):
+        # Auto login
+        user_id = res['user']['id']
+        session_token = DatabaseManager.create_session(user_id)
+        resp = make_response(jsonify(res))
+        resp.set_cookie('session_token', session_token, httponly=True, secure=True, samesite='None', max_age=7*24*3600)
+        return resp
     return jsonify(res), 400
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -520,19 +562,29 @@ def api_auth_login():
         return jsonify({"success": False, "error": "Email and password required"}), 400
 
     res = DatabaseManager.authenticate_user(email=email, password=password)
+    if res.get("success"):
+        user_id = res['user']['id']
+        session_token = DatabaseManager.create_session(user_id)
+        resp = make_response(jsonify(res))
+        resp.set_cookie('session_token', session_token, httponly=True, secure=True, samesite='None', max_age=7*24*3600)
+        return resp
     return jsonify(res), 401
-
-@app.route('/api/auth/demo', methods=['POST', 'GET'])
-def api_auth_demo():
-    res = DatabaseManager.authenticate_user(email="demo@kronos.ai", password="KronosDemo2026!")
-    return jsonify({"success": True, "user": {"id": "user_demo_001", "email": "demo@kronos.ai", "name": "Demo Investor", "role": "demo"}})
+    
+@app.route('/api/auth/logout', methods=['POST'])
+def api_auth_logout():
+    session_token = request.cookies.get('session_token')
+    if session_token:
+        DatabaseManager.delete_session(session_token)
+    resp = make_response(jsonify({"success": True}))
+    resp.set_cookie('session_token', '', expires=0, httponly=True, secure=True, samesite='None')
+    return resp
 
 @app.route('/api/auth/me', methods=['GET'])
 def api_auth_me():
-    user_id = request.args.get('user_id', 'user_demo_001')
-    user = DatabaseManager.get_user_by_id(user_id)
+    user = get_current_user()
     if user:
         return jsonify({"success": True, "user": user})
+    return jsonify({"success": False, "error": "Not authenticated"}), 401
     return jsonify({"success": True, "user": {"id": "user_demo_001", "email": "demo@kronos.ai", "name": "Demo Investor", "role": "demo"}})
 
 # ==================== MARKET OVERVIEW, TRENDING & NEWS ====================
@@ -650,7 +702,9 @@ def api_news_feed():
 
 @app.route('/api/watchlist', methods=['GET', 'POST', 'DELETE'])
 def api_watchlist():
-    user_id = request.args.get('user_id') or (request.get_json() or {}).get('user_id', 'user_demo_001')
+    user = get_current_user()
+    if not user: return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    user_id = user['id']
 
     if request.method == 'GET':
         watchlists = DatabaseManager.get_watchlists(user_id)
@@ -675,7 +729,9 @@ def api_watchlist():
 
 @app.route('/api/alerts', methods=['GET', 'POST', 'DELETE'])
 def api_alerts():
-    user_id = request.args.get('user_id') or (request.get_json() or {}).get('user_id', 'user_demo_001')
+    user = get_current_user()
+    if not user: return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    user_id = user['id']
 
     if request.method == 'GET':
         alerts = DatabaseManager.get_alerts(user_id)
@@ -750,24 +806,72 @@ def api_market_search():
 
 @app.route('/api/trading/account')
 def api_trading_account():
+    user = get_current_user()
+    if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
+    
     acc = broker_adapter.get_account()
+    # Ideally, override cash/equity with user's specific split. 
+    user_pf = DatabaseManager.get_portfolio_summary(user_id)
+    if acc.get('status') == 'ACTIVE':
+        # Overwrite with user's local balance
+        acc['cash'] = str(user_pf.get('cash', 0.0))
+        acc['buying_power'] = str(user_pf.get('cash', 0.0))
+        # Equity we compute from positions
     return jsonify(acc)
 
 @app.route('/api/trading/positions')
 def api_trading_positions():
-    pos = broker_adapter.get_positions()
-    return jsonify({"positions": pos})
+    user = get_current_user()
+    if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
+    
+    raw_pos = broker_adapter.get_positions()
+    user_pf = DatabaseManager.get_portfolio_summary(user_id)
+    local_pos = user_pf.get('positions', {})
+    
+    my_positions = []
+    total_market_value = 0.0
+    for p in raw_pos:
+        sym = p.get('symbol')
+        if sym in local_pos:
+            local_qty = local_pos[sym]['quantity']
+            if local_qty > 0:
+                p_copy = dict(p)
+                # Scale values
+                alpaca_qty = float(p.get('qty', 1.0) or 1.0)
+                if alpaca_qty == 0: alpaca_qty = 1.0 # avoid div/0
+                ratio = local_qty / alpaca_qty
+                p_copy['qty'] = str(local_qty)
+                p_copy['market_value'] = str(float(p.get('market_value', 0.0)) * ratio)
+                p_copy['unrealized_pl'] = str(float(p.get('unrealized_pl', 0.0)) * ratio)
+                p_copy['avg_entry_price'] = str(local_pos[sym].get('avg_entry_price', p.get('avg_entry_price', 0)))
+                my_positions.append(p_copy)
+                total_market_value += float(p_copy['market_value'])
+                
+    return jsonify({"positions": my_positions})
 
 @app.route('/api/trading/orders')
 def api_trading_orders():
+    user = get_current_user()
+    if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
+    
     status = request.args.get('status')
     orders = broker_adapter.get_orders(status=status)
-    return jsonify({"orders": orders})
+    
+    # Filter by user suffix in client_order_id
+    # When we place order, we should suffix client_order_id with f"_{user_id}"
+    my_orders = [o for o in orders if o.get('client_order_id', '').endswith(f"_{user_id}")]
+    return jsonify({"orders": my_orders})
 
 @app.route('/api/trading/executions')
 def api_trading_executions():
-    executions = broker_adapter.get_executions()
-    return jsonify({"executions": executions})
+    user = get_current_user()
+    if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
+    
+    return jsonify({"executions": []}) # Optional, can be derived from DB
 
 @app.route('/api/trading/place-order', methods=['POST'])
 def api_trading_place_order():
@@ -1492,6 +1596,10 @@ def api_trading_confirm_trade():
 
 @app.route('/api/agent_run', methods=['POST'])
 def api_agent_run():
+    user = get_current_user()
+    if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
+
     ensure_model_loaded()
     data = request.get_json() or {}
     symbol = data.get('symbol', 'BTCUSD')
@@ -1501,12 +1609,13 @@ def api_agent_run():
 
     try:
         from webui.agents_engine.orchestrator import AgentEngineOrchestrator
-        orchestrator = AgentEngineOrchestrator(broker=broker, predictor=predictor)
+        orchestrator = AgentEngineOrchestrator(broker=broker_adapter, predictor=predictor)
         result = orchestrator.run_cycle(
             symbol=symbol,
             timeframe=timeframe,
             allow_trading=allow_trading,
-            analysis_id=analysis_id
+            analysis_id=analysis_id,
+            user_id=user_id
         )
         return jsonify(result)
     except Exception as e:
@@ -2510,13 +2619,9 @@ from webui.strategies.early_signal_scanner import EarlySignalScanner
 
 scanner_instance = EarlySignalScanner()
 
-@app.route('/api/scanner/history', methods=['GET'])
-def api_scanner_history():
-    return jsonify(scanner_instance.get_scan_history())
 
-@app.route('/api/scanner/watchlist', methods=['GET'])
-def api_scanner_watchlist():
-    return jsonify(scanner_instance.get_watchlist())
+
+
 
 @app.route('/api/scanner/scan', methods=['POST'])
 def api_scanner_scan():
@@ -2529,6 +2634,15 @@ def api_scanner_scan():
     results = scanner_instance.scan_assets(coin_ids, manual_mentions)
     return jsonify(results)
 
+
+# Setup System Proof Blueprint
+try:
+    from verification_routes import verification_bp
+    app.register_blueprint(verification_bp)
+    print("✅ System Proof Verification Center registered")
+except Exception as e:
+    print(f"Failed to load System Proof Verification Blueprint: {e}")
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7070))
     debug = os.environ.get('FLASK_DEBUG', 'false').lower() in ('true', '1')
@@ -2540,3 +2654,131 @@ if __name__ == '__main__':
         print("Tip: Will use simulated data for demonstration")
 
     app.run(debug=debug, host='0.0.0.0', port=port)
+
+
+@app.route('/api/forecast-history', methods=['GET'])
+@login_required
+def api_forecast_history():
+    user = get_current_user()
+    history = DatabaseManager.get_forecast_history(user['id'])
+    return jsonify({"forecasts": history})
+
+@app.route('/api/scanner/history', methods=['GET'])
+@login_required
+def api_scanner_history():
+    user = get_current_user()
+    # Simple query for scanner history
+    conn, _ = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(_adapt_query("SELECT signal_scan_id, asset, score, decision, timestamp_at, strategy_version FROM scanner_history WHERE user_id = ? ORDER BY timestamp_at DESC LIMIT 100"), (user['id'],))
+        history = []
+        for r in cursor.fetchall():
+            history.append({
+                "signal_scan_id": r[0],
+                "asset": r[1],
+                "score": r[2],
+                "decision": r[3],
+                "timestamp": str(r[4]) if r[4] else None,
+                "strategy_version": r[5]
+            })
+        return jsonify({"scanner_history": history})
+    finally:
+        conn.close()
+
+@app.route('/api/trading/trades', methods=['GET'])
+@login_required
+def api_trades():
+    user = get_current_user()
+    # Fetch from orders / executions / paper_orders
+    conn, _ = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        # Simplistic mapping mostly fetching from `orders` and `executions` 
+        cursor.execute(_adapt_query("""
+            SELECT o.created_at, o.symbol, o.order_type, o.side, o.quantity, 
+                   o.quantity, o.status, NULL, 
+                   o.price, o.id
+            FROM orders o
+            WHERE o.portfolio_id IN (SELECT id FROM portfolios WHERE user_id = ?)
+            ORDER BY o.created_at DESC LIMIT 100
+        """), (user['id'],))
+        
+        res = []
+        for r in cursor.fetchall():
+            res.append({
+                "date": str(r[0]),
+                "symbol": r[1],
+                "strategy": "MANUAL" if r[2] == "Market" else r[2],
+                "side": r[3],
+                "quantity": r[4],
+                "filled": r[5],
+                "status": r[6],
+                "alpaca_order_id": r[7],
+                "price": r[8],
+                "order_id": r[9]
+            })
+        return jsonify({"trades": res})
+    finally:
+        conn.close()
+
+@app.route('/api/trading/my-stocks', methods=['GET'])
+@login_required
+def api_my_stocks():
+    user = get_current_user()
+    conn, _ = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        pf_sum = DatabaseManager.get_portfolio_summary(user['id'])
+        positions = pf_sum.get("positions", {})
+        
+        # Also grab watched
+        cursor.execute(_adapt_query("SELECT symbol FROM watchlist_items WHERE watchlist_id IN (SELECT id FROM watchlists WHERE user_id = ?)"), (user['id'],))
+        watched = [r[0] for r in cursor.fetchall()]
+        
+        # Merge unique
+        all_syms = set(positions.keys()).union(set(watched))
+        stocks = []
+        for s in all_syms:
+            stocks.append({
+                "symbol": s,
+                "position": positions.get(s, {}).get("quantity", 0),
+                "avg_entry": positions.get(s, {}).get("avg_entry_price", 0),
+                "watched": s in watched
+            })
+        return jsonify({"stocks": stocks})
+    finally:
+        conn.close()
+
+
+@app.route('/api/profile', methods=['PATCH'])
+@login_required
+def api_profile_patch():
+    user = get_current_user()
+    data = request.get_json() or {}
+    new_password = data.get('password')
+    
+    if new_password:
+        if len(new_password) < 6:
+            return jsonify({"success": False, "error": "Password must be at least 6 characters"}), 400
+        
+        conn, _ = get_db_connection()
+        try:
+            cursor = conn.cursor()
+            pwd_hash = hash_password(new_password)
+            cursor.execute(_adapt_query("UPDATE users SET password_hash = ? WHERE id = ?"), (pwd_hash, user['id']))
+            conn.commit()
+            return jsonify({"success": True, "message": "Password updated"})
+        except Exception as e:
+            print("Error updating password:", e)
+            return jsonify({"success": False, "error": "Database error"}), 500
+        finally:
+            conn.close()
+            
+    return jsonify({"success": True})
+
+@app.route('/api/scanner/watchlist', methods=['GET'])
+@login_required
+def api_scanner_watchlist():
+    user = get_current_user()
+    return jsonify(scanner_instance.get_watchlist(user_id=user['id']))
