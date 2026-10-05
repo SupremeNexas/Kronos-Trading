@@ -508,80 +508,6 @@ def api_auth_register():
         return jsonify({"success": False, "error": "Valid email and password (min 6 characters) required"}), 400
 
     res = DatabaseManager.create_user(email=email, password=password, name=name or email.split('@')[0])
-
-    if res.get("success"):
-        try:
-            import uuid
-            from webui.db import get_db_connection, _adapt_query
-            conn, _ = get_db_connection()
-            cursor = conn.cursor()
-            trade_id = f"mnl_{uuid.uuid4().hex[:8]}"
-            prediction_id = analysis_id
-            run_id = "MANUAL"
-            
-            # Record proposal
-            sql1 = "INSERT INTO trade_proposals (id, prediction_id, run_id, symbol, side, proposed_quantity, approved_quantity, order_type, limit_price, validation_status, risk_status, confirmation_state, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            cursor.execute(_adapt_query(sql1), (
-                trade_id, prediction_id, run_id, symbol, side, quantity, quantity, order_type, price, "PASS", "ALLOW", "CONFIRMED", "Manual Terminal Action"
-            ))
-            
-            # Record order
-            order_info = res.get('order', {})
-            alpaca_id = order_info.get('order_id', order_info.get('id', ''))
-            
-            sql2 = "INSERT INTO paper_orders (id, trade_id, alpaca_order_id, order_status, actual_fill_price, filled_quantity, submitted_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            po_id = f"po_{uuid.uuid4().hex[:8]}"
-            cursor.execute(_adapt_query(sql2), (
-                po_id, trade_id, alpaca_id, "submitted", 0.0, 0.0
-            ))
-            conn.commit()
-            conn.close()
-        except Exception as ex:
-            print("DB tracking failed:", ex)
-    
-    # === EARLY SIGNAL SCANNER TRACKING ===
-    strategy = data.get("strategy")
-    if strategy == "EARLY_SIGNAL_SCANNER":
-        try:
-            import json, os
-            from datetime import datetime
-            
-            tracker_file = os.path.join(DATA_DIR, "scanner_trades.json") if 'DATA_DIR' in globals() else "webui/data/scanner_trades.json"
-            if not os.path.exists(os.path.dirname(tracker_file)):
-                os.makedirs(os.path.dirname(tracker_file), exist_ok=True)
-            
-            if not os.path.exists(tracker_file):
-                with open(tracker_file, "w") as tf:
-                    json.dump([], tf)
-                    
-            with open(tracker_file, "r") as tf:
-                trades_hist = json.load(tf)
-                
-            trades_hist.append({
-                "strategy": "EARLY_SIGNAL_SCANNER",
-                "signal_scan_id": data.get("signal_scan_id"),
-                "asset": symbol,
-                "signal_score": data.get("signal_score"),
-                "volume_ratio": data.get("volume_ratio"),
-                "attention_score": data.get("attention_score"),
-                "momentum_7d": data.get("momentum_7d"),
-                "decision": data.get("decision"),
-                "user_action": f"{side} {quantity}",
-                "alpaca_order_id": res.get("order", {}).get("order_id", res.get("order", {}).get("id", "")),
-                "fill": res.get("order", {}).get("filled_qty", 0),
-                "position": quantity if side.upper() == "BUY" else -quantity,
-                "outcome": "PENDING",
-                "timestamp": datetime.utcnow().isoformat() + "Z"
-            })
-            
-            with open(tracker_file, "w") as tf:
-                json.dump(trades_hist, tf, indent=2)
-        except Exception as e:
-            print("Scanner trade tracking failed:", e)
-    # =====================================
-
-        return jsonify(res)
-
     return jsonify(res), 400
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -594,75 +520,11 @@ def api_auth_login():
         return jsonify({"success": False, "error": "Email and password required"}), 400
 
     res = DatabaseManager.authenticate_user(email=email, password=password)
-
-    if res.get("success"):
-        try:
-            import uuid
-            from webui.db import get_db_connection, _adapt_query
-            conn, _ = get_db_connection()
-            cursor = conn.cursor()
-            trade_id = f"mnl_{uuid.uuid4().hex[:8]}"
-            prediction_id = analysis_id
-            run_id = "MANUAL"
-            
-            # Record proposal
-            sql1 = "INSERT INTO trade_proposals (id, prediction_id, run_id, symbol, side, proposed_quantity, approved_quantity, order_type, limit_price, validation_status, risk_status, confirmation_state, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            cursor.execute(_adapt_query(sql1), (
-                trade_id, prediction_id, run_id, symbol, side, quantity, quantity, order_type, price, "PASS", "ALLOW", "CONFIRMED", "Manual Terminal Action"
-            ))
-            
-            # Record order
-            order_info = res.get('order', {})
-            alpaca_id = order_info.get('order_id', order_info.get('id', ''))
-            
-            sql2 = "INSERT INTO paper_orders (id, trade_id, alpaca_order_id, order_status, actual_fill_price, filled_quantity, submitted_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            po_id = f"po_{uuid.uuid4().hex[:8]}"
-            cursor.execute(_adapt_query(sql2), (
-                po_id, trade_id, alpaca_id, "submitted", 0.0, 0.0
-            ))
-            conn.commit()
-            conn.close()
-        except Exception as ex:
-            print("DB tracking failed:", ex)
-        return jsonify(res)
-
     return jsonify(res), 401
 
 @app.route('/api/auth/demo', methods=['POST', 'GET'])
 def api_auth_demo():
     res = DatabaseManager.authenticate_user(email="demo@kronos.ai", password="KronosDemo2026!")
-
-    if res.get("success"):
-        try:
-            import uuid
-            from webui.db import get_db_connection, _adapt_query
-            conn, _ = get_db_connection()
-            cursor = conn.cursor()
-            trade_id = f"mnl_{uuid.uuid4().hex[:8]}"
-            prediction_id = analysis_id
-            run_id = "MANUAL"
-            
-            # Record proposal
-            sql1 = "INSERT INTO trade_proposals (id, prediction_id, run_id, symbol, side, proposed_quantity, approved_quantity, order_type, limit_price, validation_status, risk_status, confirmation_state, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            cursor.execute(_adapt_query(sql1), (
-                trade_id, prediction_id, run_id, symbol, side, quantity, quantity, order_type, price, "PASS", "ALLOW", "CONFIRMED", "Manual Terminal Action"
-            ))
-            
-            # Record order
-            order_info = res.get('order', {})
-            alpaca_id = order_info.get('order_id', order_info.get('id', ''))
-            
-            sql2 = "INSERT INTO paper_orders (id, trade_id, alpaca_order_id, order_status, actual_fill_price, filled_quantity, submitted_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            po_id = f"po_{uuid.uuid4().hex[:8]}"
-            cursor.execute(_adapt_query(sql2), (
-                po_id, trade_id, alpaca_id, "submitted", 0.0, 0.0
-            ))
-            conn.commit()
-            conn.close()
-        except Exception as ex:
-            print("DB tracking failed:", ex)
-        return jsonify(res)
-
     return jsonify({"success": True, "user": {"id": "user_demo_001", "email": "demo@kronos.ai", "name": "Demo Investor", "role": "demo"}})
 
 @app.route('/api/auth/me', methods=['GET'])
@@ -918,12 +780,9 @@ def api_trading_place_order():
     trigger_price = float(data.get('trigger_price', 0))
     time_in_force = data.get('time_in_force', 'DAY')
     idempotency_key = data.get('idempotency_key')
-    analysis_id = data.get('analysis_id', 'MANUAL_TRADE')
 
-    if not symbol or quantity <= 0:
-        return jsonify({'success': False, 'error': 'Missing or invalid parameters: symbol and quantity must be valid.'}), 400
-    if order_type.lower() == 'limit' and price <= 0:
-        return jsonify({'success': False, 'error': 'Limit orders require a valid price.'}), 400
+    if not symbol or quantity <= 0 or price <= 0:
+        return jsonify({'success': False, 'error': 'Missing or invalid parameters: symbol, quantity, and price must be valid.'}), 400
 
     track_event('paper_order_submitted', {'symbol': symbol, 'side': side, 'quantity': quantity})
     res = broker_adapter.place_order(
@@ -937,38 +796,56 @@ def api_trading_place_order():
         idempotency_key=idempotency_key
     )
 
-
-    if res.get("success"):
+    # === EARLY SIGNAL SCANNER TRACKING ===
+    strategy = data.get("strategy")
+    if strategy == "EARLY_SIGNAL_SCANNER":
         try:
             import uuid
             from webui.db import get_db_connection, _adapt_query
+            
             conn, _ = get_db_connection()
             cursor = conn.cursor()
-            trade_id = f"mnl_{uuid.uuid4().hex[:8]}"
-            prediction_id = analysis_id
-            run_id = "MANUAL"
             
-            # Record proposal
-            sql1 = "INSERT INTO trade_proposals (id, prediction_id, run_id, symbol, side, proposed_quantity, approved_quantity, order_type, limit_price, validation_status, risk_status, confirmation_state, reason, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            cursor.execute(_adapt_query(sql1), (
-                trade_id, prediction_id, run_id, symbol, side, quantity, quantity, order_type, price, "PASS", "ALLOW", "CONFIRMED", "Manual Terminal Action"
-            ))
-            
-            # Record order
-            order_info = res.get('order', {})
+            order_info = res.get('order', {}) if res else {}
+            # Allow saving even if res failed, but store outcome
             alpaca_id = order_info.get('order_id', order_info.get('id', ''))
             
-            sql2 = "INSERT INTO paper_orders (id, trade_id, alpaca_order_id, order_status, actual_fill_price, filled_quantity, submitted_at) VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)"
-            po_id = f"po_{uuid.uuid4().hex[:8]}"
-            cursor.execute(_adapt_query(sql2), (
-                po_id, trade_id, alpaca_id, "submitted", 0.0, 0.0
+            trade_id = f"st_{uuid.uuid4().hex[:8]}"
+            
+            sql = '''
+            INSERT INTO scanner_trades (
+                id, signal_scan_id, strategy, asset, signal_score, volume_ratio, 
+                attention_score, momentum_7d, decision, user_action, alpaca_order_id, 
+                fill_qty, position_size, outcome, timestamp_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            '''
+            
+            outcome_status = "PENDING" if res and res.get("success") else "REJECTED"
+            
+            cursor.execute(_adapt_query(sql), (
+                trade_id,
+                data.get("signal_scan_id"),
+                "EARLY_SIGNAL_SCANNER",
+                symbol,
+                int(data.get("signal_score") or 0),
+                str(data.get("volume_ratio", "UNKNOWN")),
+                str(data.get("attention_score", "UNKNOWN")),
+                str(data.get("momentum_7d", "UNKNOWN")),
+                data.get("decision", "MANUAL_TRADE"),
+                f"{side} {quantity}",
+                alpaca_id,
+                float(order_info.get('filled_qty', 0)),
+                float(quantity if side.upper() == "BUY" else -quantity),
+                outcome_status
             ))
             conn.commit()
             conn.close()
-        except Exception as ex:
-            print("DB tracking failed:", ex)
-        return jsonify(res)
+        except Exception as e:
+            print("Scanner trade DB tracking failed:", e)
+    # =====================================
 
+    if res and res.get('success'):
+        return jsonify(res)
     else:
         return jsonify(res), 400
 
@@ -2651,7 +2528,6 @@ def api_scanner_scan():
         
     results = scanner_instance.scan_assets(coin_ids, manual_mentions)
     return jsonify(results)
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 7070))

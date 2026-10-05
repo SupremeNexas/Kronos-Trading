@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Zap, Play, CheckCircle2, History, AlertCircle, RefreshCw, Layers } from "lucide-react";
+import { Zap, Play, CheckCircle2, History, AlertCircle, RefreshCw, Layers, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -138,7 +138,7 @@ export default function SignalScannerPage() {
               : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
           )}
         >
-          Performance Tracking
+          Performance (Coming Soon)
         </button>
       </div>
 
@@ -229,13 +229,13 @@ export default function SignalScannerPage() {
 
       {activeTab === "performance" && (
         <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-white font-medium mb-4">Strategy Performance Tracking</h3>
+          <h3 className="text-white font-medium mb-4">Strategy Performance (Coming Soon)</h3>
           <p className="text-slate-400 text-sm mb-4">
             Compare KRONOS strategy performance vs EARLY_SIGNAL_SCANNER performance vs user decisions.
             This area will display matched performance metrics once manual trades have been executed based on scanner signals.
           </p>
           <div className="border border-slate-800 rounded bg-slate-950 flex p-8 items-center justify-center text-slate-500">
-            Awaiting completed manual trades...
+            Metrics processing pipeline under construction. (Coming Soon)
           </div>
         </div>
       )}

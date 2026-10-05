@@ -284,8 +284,55 @@ _TABLES_SQL_SQLITE = [
         actual_happened TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )"""
-]
+, 
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_history (
+        signal_scan_id VARCHAR(255) PRIMARY KEY,
+        strategy_version VARCHAR(50),
+        data_source VARCHAR(255),
+        timestamp_at TIMESTAMP,
+        asset VARCHAR(50),
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        score INTEGER,
+        decision VARCHAR(50),
+        reasons TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_watchlist (
+        asset VARCHAR(50) PRIMARY KEY,
+        signal_scan_id VARCHAR(255),
+        timestamp_at TIMESTAMP,
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        score INTEGER,
+        reasons TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_trades (
+        id VARCHAR(255) PRIMARY KEY,
+        signal_scan_id VARCHAR(255),
+        strategy VARCHAR(100),
+        asset VARCHAR(50),
+        signal_score INTEGER,
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        decision VARCHAR(50),
+        user_action VARCHAR(100),
+        alpaca_order_id VARCHAR(255),
+        fill_qty FLOAT,
+        position_size FLOAT,
+        outcome VARCHAR(50),
+        timestamp_at TIMESTAMP
+    )
+    '''
 
+]
 _TABLES_SQL_POSTGRES = [
     """CREATE TABLE IF NOT EXISTS users (
         id TEXT PRIMARY KEY,
@@ -504,9 +551,55 @@ _TABLES_SQL_POSTGRES = [
         actual_happened TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )"""
+, 
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_history (
+        signal_scan_id VARCHAR(255) PRIMARY KEY,
+        strategy_version VARCHAR(50),
+        data_source VARCHAR(255),
+        timestamp_at TIMESTAMP,
+        asset VARCHAR(50),
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        score INTEGER,
+        decision VARCHAR(50),
+        reasons TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_watchlist (
+        asset VARCHAR(50) PRIMARY KEY,
+        signal_scan_id VARCHAR(255),
+        timestamp_at TIMESTAMP,
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        score INTEGER,
+        reasons TEXT
+    )
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS scanner_trades (
+        id VARCHAR(255) PRIMARY KEY,
+        signal_scan_id VARCHAR(255),
+        strategy VARCHAR(100),
+        asset VARCHAR(50),
+        signal_score INTEGER,
+        volume_ratio VARCHAR(50),
+        attention_score VARCHAR(50),
+        momentum_7d VARCHAR(50),
+        decision VARCHAR(50),
+        user_action VARCHAR(100),
+        alpaca_order_id VARCHAR(255),
+        fill_qty FLOAT,
+        position_size FLOAT,
+        outcome VARCHAR(50),
+        timestamp_at TIMESTAMP
+    )
+    '''
+
 ]
-
-
 class DatabaseManager:
     """
     Unified database manager handling schema migrations, users,

@@ -73,14 +73,22 @@ function ManualTradingTerminalInner() {
   const handlePlaceOrder = async () => {
     if (!confirm(`Confirm ${side} ${quantity} ${symbol} @ ${orderType}?`)) return;
     try {
-      const res = await axios.post('/api/trading/place-order', {
+      const payload = {
         symbol,
         side,
         quantity,
         order_type: orderType,
         price: orderType === 'Limit' ? limitPrice : 0,
-        analysis_id: forecast?.analysis_id
-      });
+        analysis_id: forecast?.analysis_id,
+        strategy: strategyParam || undefined,
+        signal_scan_id: scanIdParam || undefined,
+        signal_score: scoreParam || undefined,
+        volume_ratio: volParam || undefined,
+        attention_score: attentionParam || undefined,
+        momentum_7d: momentumParam || undefined,
+        decision: strategyParam ? "MANUAL_TRADE" : undefined
+      };
+      const res = await axios.post('/api/trading/place-order', payload);
       if (res.data.success) {
         alert('Order submitted in PAPER mode!');
         fetchAccountData();
