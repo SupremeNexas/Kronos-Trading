@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
+  Zap,
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,6 +30,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
+  { label: "Strategies", href: "/strategies", icon: Zap, badge: "New" },
+
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Markets", href: "/markets", icon: TrendingUp },
   { label: "Forecast", href: "/forecast", icon: Brain, badge: "AI" },

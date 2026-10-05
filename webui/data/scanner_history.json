@@ -1,0 +1,36 @@
+[
+  {
+    "strategy_version": "1.0",
+    "data_source": "CoinGecko V3 API",
+    "timestamp": "2026-10-05T07:58:44.175928Z",
+    "asset": "ethereum",
+    "signal_scan_id": "0107ea81-4742-42a6-8bdd-b5c8ba48de5d",
+    "volume_ratio": 0.6547886981371849,
+    "attention_score": 0,
+    "momentum_7d": 2.6956,
+    "score": 0,
+    "decision": "MONITOR",
+    "reasons": [
+      "Momentum 2.70% < 5.0%",
+      "Volume Ratio 0.65 < 1.5",
+      "Attention Score 0 < 1"
+    ]
+  },
+  {
+    "strategy_version": "1.0",
+    "data_source": "CoinGecko V3 API",
+    "timestamp": "2026-10-05T07:58:44.981770Z",
+    "asset": "solana",
+    "signal_scan_id": "ee23757b-5e6d-455a-97a1-39b0212554c4",
+    "volume_ratio": 0.7164671146935445,
+    "attention_score": 1,
+    "momentum_7d": 2.0156,
+    "score": 1,
+    "decision": "MONITOR",
+    "reasons": [
+      "Momentum 2.02% < 5.0%",
+      "Volume Ratio 0.72 < 1.5",
+      "Attention Score 1 >= 1 (Trending: True, Mentions: 0)"
+    ]
+  }
+]
