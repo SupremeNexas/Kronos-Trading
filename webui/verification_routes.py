@@ -163,7 +163,8 @@ def run_verification():
         # 6. Manual Trading Terminal Trace
         trace_feat = {"name": "Full Scanner->Terminal Trace", "category": "6. Scanner->Terminal Trace", "evidence": {}, "status": "NOT VERIFIED"}
         try:
-            with db.get_connection() as conn:
+            conn, is_sqlite = get_db_connection()
+            try:
                 cursor = conn.cursor()
                 cursor.execute("SELECT count(*) FROM paper_orders WHERE alpaca_order_id IS NOT NULL AND alpaca_order_id != ''")
                 valid_orders = cursor.fetchone()[0]
@@ -176,6 +177,8 @@ def run_verification():
                 else:
                     trace_feat["status"] = "NOT VERIFIED"
                     trace_feat["evidence"]["info"] = "NOT VERIFIED - NO REAL LINKED TRADE FOUND"
+            finally:
+                conn.close()
         except Exception as e:
             trace_feat["status"] = "FAILED"
         features_to_check.append(trace_feat)
