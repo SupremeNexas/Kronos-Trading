@@ -9,8 +9,6 @@ from flask_cors import CORS
 import sys
 import warnings
 import datetime
-import uuid
-
 import requests
 try:
     import torch
@@ -133,11 +131,19 @@ except Exception as e:
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data', 'paper_portfolio.json')
 is_prod = os.environ.get("RENDER") is not None
 
-# For Kronos priority 1 (No Mocks allowed in production path)
-if ALPACA_AVAILABLE:
-    broker_adapter = AlpacaBrokerAdapter()
+if is_prod:
+    # Strictly enforce real brokerage (Alpaca) in production, fail gracefully if keys absent
+    if not ALPACA_AVAILABLE:
+        print("WARNING: Alpaca not installed, but running in production. Broker will fail.")
+        broker_adapter = None
+    else:
+        broker_adapter = AlpacaBrokerAdapter()
 else:
-    broker_adapter = AlpacaBrokerAdapter() # it will safely fail inside
+    # Local fallback logic
+    if ALPACA_AVAILABLE and (os.environ.get("ALPACA_API_KEY") or os.environ.get("APCA_API_KEY_ID")):
+        broker_adapter = AlpacaBrokerAdapter()
+    else:
+        broker_adapter = MockBrokerAdapter(db_path)
 broker = broker_adapter
 market_provider = MarketDataProvider()
 berkshire_engine = AIBerkshireEngine()
@@ -806,8 +812,16 @@ def api_market_search():
 def api_trading_account():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
     
     acc = broker_adapter.get_account()
+    # Ideally, override cash/equity with user's specific split. 
+    user_pf = DatabaseManager.get_portfolio_summary(user_id)
+    if acc.get('status') == 'ACTIVE':
+        # Overwrite with user's local balance
+        acc['cash'] = str(user_pf.get('cash', 0.0))
+        acc['buying_power'] = str(user_pf.get('cash', 0.0))
+        # Equity we compute from positions
     return jsonify(acc)
 
 @app.route('/api/trading/positions')
@@ -815,9 +829,32 @@ def api_trading_account():
 def api_trading_positions():
     user = get_current_user()
     if not user: return jsonify({"error": "Unauthorized"}), 401
+    user_id = user['id']
     
     raw_pos = broker_adapter.get_positions()
-    return jsonify({"positions": raw_pos})
+    user_pf = DatabaseManager.get_portfolio_summary(user_id)
+    local_pos = user_pf.get('positions', {})
+    
+    my_positions = []
+    total_market_value = 0.0
+    for p in raw_pos:
+        sym = p.get('symbol')
+        if sym in local_pos:
+            local_qty = local_pos[sym]['quantity']
+            if local_qty > 0:
+                p_copy = dict(p)
+                # Scale values
+                alpaca_qty = float(p.get('qty', 1.0) or 1.0)
+                if alpaca_qty == 0: alpaca_qty = 1.0 # avoid div/0
+                ratio = local_qty / alpaca_qty
+                p_copy['qty'] = str(local_qty)
+                p_copy['market_value'] = str(float(p.get('market_value', 0.0)) * ratio)
+                p_copy['unrealized_pl'] = str(float(p.get('unrealized_pl', 0.0)) * ratio)
+                p_copy['avg_entry_price'] = str(local_pos[sym].get('avg_entry_price', p.get('avg_entry_price', 0)))
+                my_positions.append(p_copy)
+                total_market_value += float(p_copy['market_value'])
+                
+    return jsonify({"positions": my_positions})
 
 @app.route('/api/trading/orders')
 @login_required
@@ -879,64 +916,11 @@ def api_trading_place_order():
         idempotency_key=idempotency_key
     )
 
-
-    # === SAVE TO TRADE HISTORY ===
-    if res and res.get('success'):
-        try:
-            from webui.db import get_db_connection, _adapt_query
-            conn, _ = get_db_connection()
-            cursor = conn.cursor()
-            
-            order_info = res.get('order', {})
-            alpaca_id = order_info.get('order_id', order_info.get('id', ''))
-            trade_id = f"trt_{uuid.uuid4().hex[:8]}"
-            
-            sql = '''
-            INSERT INTO trade_history (
-                id, user_id, alpaca_order_id, client_order_id, symbol, side, quantity, 
-                order_type, limit_price, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            '''
-            cursor.execute(_adapt_query(sql), (
-                trade_id, user_id, alpaca_id, idempotency_key, symbol, side, quantity, 
-                order_type, price if order_type.upper() != 'MARKET' else 0.0, 'NEW'
-            ))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            print("Trade history DB tracking failed:", e)
-
-
-    # === SAVE TO TRADE HISTORY ===
-    if res and res.get('success'):
-        try:
-            from webui.db import get_db_connection, _adapt_query
-            conn, _ = get_db_connection()
-            cursor = conn.cursor()
-            
-            order_info = res.get('order', {})
-            alpaca_id = order_info.get('order_id', order_info.get('id', ''))
-            trade_id = f"trt_{uuid.uuid4().hex[:8]}"
-            
-            sql = '''
-            INSERT INTO trade_history (
-                id, user_id, alpaca_order_id, client_order_id, symbol, side, quantity, 
-                order_type, limit_price, status
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            '''
-            cursor.execute(_adapt_query(sql), (
-                trade_id, user_id, alpaca_id, idempotency_key, symbol, side, quantity, 
-                order_type, price if order_type.upper() != 'MARKET' else 0.0, 'NEW'
-            ))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            print("Trade history DB tracking failed:", e)
-
     # === EARLY SIGNAL SCANNER TRACKING ===
     strategy = data.get("strategy")
     if strategy == "EARLY_SIGNAL_SCANNER":
         try:
+            import uuid
             from webui.db import get_db_connection, _adapt_query
             
             conn, _ = get_db_connection()
@@ -2451,7 +2435,6 @@ def _exec_insert(query, params=()):
 @app.route('/api/lab/portfolio-snapshot', methods=['GET'])
 def api_lab_portfolio_snapshot():
     import datetime, json
-
     try:
         try:
             account = broker.get_account()
@@ -2534,6 +2517,7 @@ def api_lab_daily_journal():
 
 @app.route('/api/lab/daily-journal/generate', methods=['POST'])
 def api_lab_daily_journal_generate():
+    import uuid, datetime
     try:
         now = datetime.datetime.now().strftime('%Y-%m-%d')
         # Create table if not exists
@@ -2714,86 +2698,34 @@ def api_scanner_history():
 @login_required
 def api_trades():
     user = get_current_user()
-    user_id = user['id']
     conn, _ = get_db_connection()
     cursor = conn.cursor()
     try:
-        # Sync open orders from Alpaca to maintain accurate status
-        alpaca_orders = broker_adapter.get_orders(status="all") 
-        alpaca_dict = {}
-        for o in alpaca_orders:
-            if o.get('client_order_id', '').endswith(f"_{user_id}") or not o.get('client_order_id'):
-                alpaca_dict[o['order_id']] = o
-
-        # Update trade_history from alpaca_dict
-        for oid, odata in alpaca_dict.items():
-            cursor.execute(_adapt_query(
-                "UPDATE trade_history SET status=?, filled_quantity=?, fill_price=? WHERE alpaca_order_id=? AND user_id=?"
-            ), (odata['status'], odata.get('filled_quantity', 0.0), odata.get('fill_price', 0.0), oid, user_id))
-        conn.commit()
-
-        # Fetch manual trades
         cursor.execute(_adapt_query("""
-            SELECT submitted_at, symbol, side, quantity, filled_quantity, order_type, 
-                   limit_price, fill_price, status, alpaca_order_id
-            FROM trade_history
+            SELECT timestamp_at, asset, strategy, user_action, position_size, decision, outcome, alpaca_order_id, signal_scan_id
+            FROM scanner_trades
             WHERE user_id = ?
-            ORDER BY submitted_at DESC LIMIT 100
-        """), (user_id,))
+            ORDER BY timestamp_at DESC LIMIT 100
+        """), (user['id'],))
         
-        trade_rows = cursor.fetchall()
-        trades = []
-        for r in trade_rows:
-            trades.append({
-                "date": str(r[0])[0:19],
+        res = []
+        for r in cursor.fetchall():
+            res.append({
+                "date": str(r[0]),
                 "symbol": r[1],
-                "strategy": "MANUAL",
-                "side": r[2],
-                "quantity": float(r[3]),
-                "filled_quantity": float(r[4]) if r[4] else 0.0,
-                "order_type": r[5],
-                "limit_price": float(r[6]) if r[6] else None,
-                "fill_price": float(r[7]) if r[7] else None,
-                "status": r[8],
-                "alpaca_order_id": r[9]
+                "strategy": r[2] or "MANUAL",
+                "side": r[3] if r[3] else "UNKNOWN",
+                "quantity": abs(float(r[4])) if r[4] else 0.0,
+                "status": r[6] or "UNKNOWN",
+                "price": None, # Price ideally from alpaca execution or other storage
+                "alpaca_order_id": r[7] or "",
+                "signal_scan_id": r[8] or ""
             })
-
-        # Fetch scanner trades
-        try: # might not exist
-            cursor.execute(_adapt_query("""
-                SELECT timestamp_at, asset, strategy, user_action, position_size, decision, outcome, alpaca_order_id, position_size
-                FROM scanner_trades
-                WHERE user_id = ?
-                ORDER BY timestamp_at DESC LIMIT 100
-            """), (user_id,))
-            scanner_rows = cursor.fetchall()
-            for r in scanner_rows:
-                if r[7] and any(t['alpaca_order_id'] == r[7] for t in trades):
-                    continue
-                    
-                qty = abs(float(r[4])) if r[4] else 0.0
-                trades.append({
-                    "date": str(r[0])[0:19],
-                    "symbol": r[1],
-                    "strategy": r[2] or "SCANNER",
-                    "side": r[3].split()[0] if r[3] else "UNKNOWN",
-                    "quantity": qty,
-                    "filled_quantity": qty if str(r[6]).upper() == 'FILLED' else 0.0,
-                    "order_type": "MARKET",
-                    "limit_price": None,
-                    "fill_price": None, 
-                    "status": r[6] or "UNKNOWN",
-                    "alpaca_order_id": r[7] or ""
-                })
-        except: pass
-            
-        trades.sort(key=lambda x: x['date'], reverse=True)
-            
-        return jsonify({"trades": trades})
+        return jsonify({"trades": res})
     except Exception as e:
         import traceback
         traceback.print_exc()
-        return jsonify({"trades": [], "error": str(e)})
+        return jsonify({"error": str(e), "trades": []})
     finally:
         conn.close()
 

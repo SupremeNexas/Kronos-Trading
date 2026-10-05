@@ -62,16 +62,16 @@ def run_verification():
         # 1. Database Persistence
         db_feat = {"name": "Database Persistence", "category": "AB. Database", "evidence": {}, "status": "NOT VERIFIED"}
         try:
-            is_pg = db.IS_POSTGRES
+            is_pg = IS_POSTGRES
             db_feat["evidence"]["type"] = "PostgreSQL" if is_pg else "SQLite"
             
-            with db.get_connection() as conn:
+            with get_db_connection()[0] as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT count(*) FROM users")
                 ucount = cursor.fetchone()[0]
                 db_feat["evidence"]["users"] = ucount
                 
-                cursor.execute("SELECT count(*) FROM paper_orders")
+                cursor.execute("SELECT count(*) FROM scanner_trades")
                 ocount = cursor.fetchone()[0]
                 db_feat["evidence"]["paper_orders"] = ocount
                 
@@ -128,14 +128,14 @@ def run_verification():
         # 4. Early Signal Scanner
         scanner_feat = {"name": "Early Signal Scanner", "category": "G. Early Signal Scanner", "evidence": {}, "status": "NOT VERIFIED"}
         try:
-            with db.get_connection() as conn:
+            with get_db_connection()[0] as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT count(*) FROM scanner_history")
                 sh_count = cursor.fetchone()[0]
                 scanner_feat["evidence"]["scan_history_records"] = sh_count
                 if sh_count > 0:
                     scanner_feat["status"] = "VERIFIED"
-                    cursor.execute("SELECT symbol, total_score, decision FROM scanner_history ORDER BY scanned_at DESC LIMIT 1")
+                    cursor.execute("SELECT asset, score, decision FROM scanner_history ORDER BY timestamp_at DESC LIMIT 1")
                     last_scan = cursor.fetchone()
                     if last_scan:
                         scanner_feat["evidence"]["latest_scan"] = f"{last_scan[0]} (Score: {last_scan[1]} - {last_scan[2]})"
@@ -166,13 +166,13 @@ def run_verification():
             conn, is_sqlite = get_db_connection()
             try:
                 cursor = conn.cursor()
-                cursor.execute("SELECT count(*) FROM paper_orders WHERE alpaca_order_id IS NOT NULL AND alpaca_order_id != ''")
+                cursor.execute("SELECT count(*) FROM scanner_trades WHERE alpaca_order_id IS NOT NULL AND alpaca_order_id != ''")
                 valid_orders = cursor.fetchone()[0]
                 if valid_orders > 0:
                     trace_feat["status"] = "VERIFIED"
-                    cursor.execute("SELECT symbol, side, qty, alpaca_order_id FROM paper_orders WHERE alpaca_order_id IS NOT NULL ORDER BY created_at DESC LIMIT 1")
+                    cursor.execute("SELECT asset, user_action, position_size, alpaca_order_id FROM scanner_trades WHERE alpaca_order_id IS NOT NULL ORDER BY timestamp_at DESC LIMIT 1")
                     last_ord = cursor.fetchone()
-                    trace_feat["evidence"]["latest_order"] = f"{last_ord[1]} {last_ord[2]} {last_ord[0]} [ID: {last_ord[3]}]"
+                    trace_feat["evidence"]["latest_order"] = f"{last_ord[1]} {last_ord[0]} [ID: {last_ord[3]}]"
                     trace_feat["evidence"]["trace"] = "scanner->ui->submit->alpaca->db"
                 else:
                     trace_feat["status"] = "NOT VERIFIED"
@@ -181,6 +181,7 @@ def run_verification():
                 conn.close()
         except Exception as e:
             trace_feat["status"] = "FAILED"
+            trace_feat["evidence"]["error"] = str(e)
         features_to_check.append(trace_feat)
         
         results["claims_vs_evidence"].append({
@@ -208,3 +209,8 @@ def run_verification():
 
     
 
+
+    history = load_history()
+    history.insert(0, results)
+    save_history(history[:50])
+    return jsonify(results)

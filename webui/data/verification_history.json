@@ -1,0 +1,864 @@
+[
+  {
+    "timestamp": "2026-10-05T15:49:42.193404+00:00",
+    "verification_id": "VER-29BB5ADF",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 2
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "latest_order": "BUY 1.0 BTC [ID: ORD-6E836B2C]",
+          "trace": "scanner->ui->submit->alpaca->db"
+        },
+        "status": "VERIFIED"
+      }
+    ],
+    "overall_status": "OPERATIONAL",
+    "counts": {
+      "VERIFIED": 5,
+      "PARTIAL": 0,
+      "FAILED": 0,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'latest_order': 'BUY 1.0 BTC [ID: ORD-6E836B2C]', 'trace': 'scanner->ui->submit->alpaca->db'}",
+        "status": "VERIFIED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:49:37.501635+00:00",
+    "verification_id": "VER-1DAEDA05",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 2
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "latest_order": "BUY 1.0 BTC [ID: ORD-6E836B2C]",
+          "trace": "scanner->ui->submit->alpaca->db"
+        },
+        "status": "VERIFIED"
+      }
+    ],
+    "overall_status": "OPERATIONAL",
+    "counts": {
+      "VERIFIED": 5,
+      "PARTIAL": 0,
+      "FAILED": 0,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'latest_order': 'BUY 1.0 BTC [ID: ORD-6E836B2C]', 'trace': 'scanner->ui->submit->alpaca->db'}",
+        "status": "VERIFIED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:49:33.008646+00:00",
+    "verification_id": "VER-5965C3AE",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 2
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "latest_order": "BUY 1.0 BTC [ID: ORD-6E836B2C]",
+          "trace": "scanner->ui->submit->alpaca->db"
+        },
+        "status": "VERIFIED"
+      }
+    ],
+    "overall_status": "OPERATIONAL",
+    "counts": {
+      "VERIFIED": 5,
+      "PARTIAL": 0,
+      "FAILED": 0,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'latest_order': 'BUY 1.0 BTC [ID: ORD-6E836B2C]', 'trace': 'scanner->ui->submit->alpaca->db'}",
+        "status": "VERIFIED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:49:28.507811+00:00",
+    "verification_id": "VER-9C3E8A12",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 2
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "latest_order": "BUY 1.0 BTC [ID: ORD-6E836B2C]",
+          "trace": "scanner->ui->submit->alpaca->db"
+        },
+        "status": "VERIFIED"
+      }
+    ],
+    "overall_status": "OPERATIONAL",
+    "counts": {
+      "VERIFIED": 5,
+      "PARTIAL": 0,
+      "FAILED": 0,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'latest_order': 'BUY 1.0 BTC [ID: ORD-6E836B2C]', 'trace': 'scanner->ui->submit->alpaca->db'}",
+        "status": "VERIFIED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:48:45.290446+00:00",
+    "verification_id": "VER-B8E1061C",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 2
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "error": "no such column: created_at"
+        },
+        "status": "FAILED"
+      }
+    ],
+    "overall_status": "DEGRADED",
+    "counts": {
+      "VERIFIED": 4,
+      "PARTIAL": 0,
+      "FAILED": 1,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'error': 'no such column: created_at'}",
+        "status": "FAILED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:47:50.644227+00:00",
+    "verification_id": "VER-1E3CFDF8",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 34
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "latest_scan": "unknown_coin (Score: 0 - MONITOR)"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {
+          "error": "no such column: symbol"
+        },
+        "status": "FAILED"
+      }
+    ],
+    "overall_status": "DEGRADED",
+    "counts": {
+      "VERIFIED": 4,
+      "PARTIAL": 0,
+      "FAILED": 1,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{'error': 'no such column: symbol'}",
+        "status": "FAILED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:47:16.451603+00:00",
+    "verification_id": "VER-E40EDF77",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 34
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "error": "no such column: symbol"
+        },
+        "status": "FAILED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {},
+        "status": "FAILED"
+      }
+    ],
+    "overall_status": "DEGRADED",
+    "counts": {
+      "VERIFIED": 3,
+      "PARTIAL": 0,
+      "FAILED": 2,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{}",
+        "status": "FAILED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:46:48.124267+00:00",
+    "verification_id": "VER-D63E3E49",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 34
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "error": "no such column: symbol"
+        },
+        "status": "FAILED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {},
+        "status": "FAILED"
+      }
+    ],
+    "overall_status": "DEGRADED",
+    "counts": {
+      "VERIFIED": 3,
+      "PARTIAL": 0,
+      "FAILED": 2,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{}",
+        "status": "FAILED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  },
+  {
+    "timestamp": "2026-10-05T15:46:42.878188+00:00",
+    "verification_id": "VER-738C25A7",
+    "features": [
+      {
+        "name": "Database Persistence",
+        "category": "AB. Database",
+        "evidence": {
+          "type": "SQLite",
+          "users": 23,
+          "paper_orders": 34
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Authentication",
+        "category": "B. Authentication",
+        "evidence": {
+          "methods": [
+            "Register API",
+            "Login API",
+            "Session Cookie"
+          ],
+          "status": "DB connected, handlers present"
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "KRONOS Forecast Engine",
+        "category": "E. KRONOS Forecast Engine",
+        "evidence": {
+          "device": "GPU (MPS)",
+          "status": "KRONOS Small connected",
+          "tested_assets": [
+            "AAPL",
+            "MSFT"
+          ]
+        },
+        "status": "VERIFIED"
+      },
+      {
+        "name": "Early Signal Scanner",
+        "category": "G. Early Signal Scanner",
+        "evidence": {
+          "scan_history_records": 9,
+          "error": "no such column: symbol"
+        },
+        "status": "FAILED"
+      },
+      {
+        "name": "Alpaca PAPER Integration",
+        "category": "J. Alpaca PAPER Integration",
+        "evidence": {
+          "mode": "PAPER",
+          "configuration": "Using internal trading sandbox - no keys found"
+        },
+        "status": "NOT VERIFIED"
+      },
+      {
+        "name": "Full Scanner->Terminal Trace",
+        "category": "6. Scanner->Terminal Trace",
+        "evidence": {},
+        "status": "FAILED"
+      }
+    ],
+    "overall_status": "DEGRADED",
+    "counts": {
+      "VERIFIED": 3,
+      "PARTIAL": 0,
+      "FAILED": 2,
+      "NOT VERIFIED": 1
+    },
+    "claims_vs_evidence": [
+      {
+        "claim": "Database uses true persistence",
+        "evidence": "Actual DB engine: SQLite Data points: 23",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "KRONOS model performs deep learning forecasting",
+        "evidence": "Engine Torch setup: {'device': 'GPU (MPS)', 'status': 'KRONOS Small connected', 'tested_assets': ['AAPL', 'MSFT']}",
+        "status": "VERIFIED"
+      },
+      {
+        "claim": "End-to-End trading trace exists",
+        "evidence": "{}",
+        "status": "FAILED"
+      }
+    ],
+    "environment": {
+      "git_sha": "f61fff6657bb66f33ff7cc099d6d572e4d871aca",
+      "deployment": "LOCAL/PAPER"
+    }
+  }
+]

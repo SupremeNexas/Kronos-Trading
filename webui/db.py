@@ -58,6 +58,9 @@ def get_db_connection():
             conn = psycopg2.connect(DB_URL)
             return conn, "postgres"
         except Exception as e:
+            import os
+            if os.environ.get("FLASK_ENV") == "production" or os.environ.get("RENDER"):
+                raise Exception(f"FAIL SAFE: PostgreSQL connection failed in production: {e}")
             print(f"Warning: Failed to connect to PostgreSQL ({e}), falling back to SQLite.")
 
     conn = sqlite3.connect(SQLITE_DB_PATH, timeout=20.0)
@@ -313,8 +316,7 @@ _TABLES_SQL_SQLITE = [
         momentum_7d VARCHAR(50),
         score INTEGER,
         decision VARCHAR(50),
-        reasons TEXT,
-        PRIMARY KEY(user_id, asset)
+        reasons TEXT
     )
     ''',
     '''
@@ -333,6 +335,24 @@ _TABLES_SQL_SQLITE = [
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_trades (
+
+    """CREATE TABLE IF NOT EXISTS trade_history (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        alpaca_order_id TEXT NOT NULL,
+        client_order_id TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        filled_quantity REAL DEFAULT 0.0,
+        order_type TEXT NOT NULL,
+        limit_price REAL,
+        fill_price REAL,
+        status TEXT NOT NULL,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        filled_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
         user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),
@@ -600,8 +620,7 @@ _TABLES_SQL_POSTGRES = [
         momentum_7d VARCHAR(50),
         score INTEGER,
         decision VARCHAR(50),
-        reasons TEXT,
-        PRIMARY KEY(user_id, asset)
+        reasons TEXT
     )
     ''',
     '''
@@ -620,6 +639,24 @@ _TABLES_SQL_POSTGRES = [
     ''',
     '''
     CREATE TABLE IF NOT EXISTS scanner_trades (
+
+    """CREATE TABLE IF NOT EXISTS trade_history (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        alpaca_order_id TEXT NOT NULL,
+        client_order_id TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        filled_quantity REAL DEFAULT 0.0,
+        order_type TEXT NOT NULL,
+        limit_price REAL,
+        fill_price REAL,
+        status TEXT NOT NULL,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        filled_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )""",
         user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),

@@ -163,6 +163,7 @@ class AlpacaBrokerAdapter:
                     "price": float(o.limit_price) if o.limit_price else 0.0,
                     "status": o.status.value if hasattr(o.status, 'value') else str(o.status),
                     "filled_quantity": float(o.filled_qty) if o.filled_qty else 0.0,
+                    "fill_price": float(o.filled_avg_price) if getattr(o, "filled_avg_price", None) else 0.0,
                     "idempotency_key": str(o.client_order_id)
                 })
             return res
