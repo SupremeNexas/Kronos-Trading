@@ -11,6 +11,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,32 +21,47 @@ export default function Login() {
          window.location.href = '/dashboard';
       }
     } catch(err: any) {
-      alert(err.response?.data?.error || "Login failed");
+      setError('Invalid credentials');
     }
   };
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-900 border-gray-800 text-white">
-      <div className="p-8 bg-gray-800 rounded shadow-md w-96 border border-gray-700">
-        <h2 className="text-2xl font-bold mb-4">Kronos Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-sm mb-2 text-gray-400">Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} 
-                   className="w-full p-2 bg-gray-900 border border-gray-700 rounded text-white" />
+    <div className="flex h-screen items-center justify-center bg-[var(--surface-canvas)] w-full pb-[120px]">
+      <div className="w-full max-w-sm px-6">
+        <section className="bg-[var(--surface-card)] border border-[var(--color-graphite)] p-[40px]">
+          <div className="text-ui-sans text-[11px] font-medium uppercase tracking-[0.22em] text-[var(--color-ash)] mb-8 text-center">
+            [ SECURE ACCESS ]
           </div>
-          <div className="mb-4">
-            <label className="block text-sm mb-2 text-gray-400">Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} 
-                   className="w-full p-2 bg-gray-900 border border-gray-700 rounded text-white" />
+          <h2 className="text-display-serif font-light text-[32px] leading-tight tracking-[-1px] text-[var(--color-chalk)] mb-8 text-center">
+             System <span className="italic text-[var(--color-signal-lime)]">Login.</span>
+          </h2>
+          
+          <form onSubmit={handleLogin} className="space-y-[32px]">
+            {error && (
+               <div className="text-ui-sans text-[11px] tracking-[0.2em] text-[#ff4a4a] uppercase border border-[#ff4a4a] px-4 py-2 mt-4 text-center">
+                 {error}
+               </div>
+            )}
+            <div className="space-y-[24px]">
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <label className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)]">EMAIL</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} 
+                       className="bg-transparent border-none text-right text-code-mono text-[16px] text-[var(--color-chalk)] focus:outline-none w-48" required placeholder="user@domain.com" />
+              </div>
+              <div className="flex justify-between items-center border-b border-[var(--color-graphite)] pb-4">
+                <label className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)]">SECRET</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} 
+                       className="bg-transparent border-none text-right text-code-mono text-[16px] text-[var(--color-chalk)] focus:outline-none w-48" required placeholder="••••••••" />
+              </div>
+            </div>
+            <button type="submit" className="w-full inline-flex h-[44px] items-center justify-center rounded-[4px] bg-[var(--color-signal-lime)] px-[32px] text-[14px] font-medium text-[var(--color-void-black)] transition-transform active:scale-95 glow-signal uppercase">
+              AUTHENTICATE
+            </button>
+          </form>
+          <div className="mt-8 text-center border-t border-[var(--color-graphite)] pt-6">
+            <a href="/register" className="text-ui-sans text-[11px] uppercase tracking-[0.18em] text-[var(--color-smoke)] hover:text-[var(--color-chalk)] transition-colors">Create an account</a>
           </div>
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">
-            Log In
-          </button>
-        </form>
-        <div className="mt-4 text-sm text-center">
-          <a href="/register" className="text-blue-400 hover:underline">Create an account</a>
-        </div>
+        </section>
       </div>
     </div>
   );

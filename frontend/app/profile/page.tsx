@@ -61,7 +61,7 @@ export default function Profile() {
            {/* Edit functionality might be limited here to display only based on prompt request, but let's add dummy buttons */}
            <button className="px-4 py-2 border border-[var(--color-graphite)] text-xs hover:bg-[var(--surface-hover)]">EDIT PROFILE</button>
            <button onClick={() => setIsChangingPwd(!isChangingPwd)} className="px-4 py-2 border border-[var(--color-graphite)] text-xs hover:bg-[var(--surface-hover)]">CHANGE PASSWORD</button>
-           <button onClick={async () => { await axios.post('/api/auth/logout', {}, { withCredentials: true }); window.location.href='/login'; }} className="px-4 py-2 bg-red-900/20 text-red-400 border border-red-900/50 text-xs hover:bg-red-900/40">LOGOUT</button>
+           <button onClick={async () => { await axios.post('/api/auth/logout', {}, { withCredentials: true }); window.location.href='/login'; }} className="px-4 py-2 bg-[#ff4a4a]/20 text-[#ff4a4a] border border-[#ff4a4a]/50 text-xs hover:bg-[#ff4a4a]/40">LOGOUT</button>
          </div>
          {isChangingPwd && (
            <div className="mt-4 flex gap-2">
@@ -89,7 +89,7 @@ export default function Profile() {
                 </div>
                 <div>
                   <div className="text-[var(--color-smoke)] mb-1">Status</div>
-                  <div className="font-mono text-lg text-green-400">{acc.status}</div>
+                  <div className="font-mono text-lg text-[var(--color-signal-lime)]">{acc.status}</div>
                 </div>
              </div>
          ) : <p>Loading Alpaca status...</p>}

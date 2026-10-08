@@ -78,30 +78,38 @@ export default function TacticsDashboard() {
              <table className="w-full text-sm text-left">
                <thead>
                  <tr className="border-b border-[var(--color-graphite)] text-[var(--color-smoke)] bg-[#1a1a1a]">
-                   <th className="py-4 pl-6">Tactic Name</th>
-                   <th className="py-4 text-right">Trades</th>
-                   <th className="py-4 text-right">Wins</th>
-                   <th className="py-4 text-right">Losses</th>
+                   <th className="py-4 pl-4">Tactic Name</th>
+                   <th className="py-4 text-right">Trades (W/L)</th>
                    <th className="py-4 text-right">Win Rate</th>
-                   <th className="py-4 text-right pr-6">Total P&L</th>
+                   <th className="py-4 text-right">Total P&L</th>
+                   <th className="py-4 text-right">Total Return</th>
+                   <th className="py-4 text-right">Avg P&L</th>
+                   <th className="py-4 text-right">Best Trade</th>
+                   <th className="py-4 text-right pr-4">Worst Trade</th>
                  </tr>
                </thead>
                <tbody>
                  {performance.length === 0 && (
                    <tr>
-                     <td colSpan={6} className="py-6 text-center text-[var(--color-smoke)]">NO DATA</td>
+                     <td colSpan={8} className="py-6 text-center text-[var(--color-smoke)]">NO DATA</td>
                    </tr>
                  )}
                  {performance.sort((a,b) => b.total_pnl - a.total_pnl).map((p, i) => (
-                   <tr key={i} className="border-b border-[var(--color-graphite)]/50 hover:bg-[#1a1a1a]">
-                     <td className="py-4 pl-6 font-bold">{p.tactic_name}</td>
-                     <td className="py-4 text-right">{p.total_trades}</td>
-                     <td className="py-4 text-[var(--color-signal-lime)] text-right">{p.winning_trades}</td>
-                     <td className="py-4 text-[#ff4a4a] text-right">{p.losing_trades}</td>
+                   <tr key={i} className="border-b border-[var(--color-graphite)]/50 hover:bg-[#1a1a1a] cursor-pointer" onClick={() => window.location.href = `/tactics/${p.tactic_id}`}>
+                     <td className="py-4 pl-4 font-bold">{p.tactic_name}</td>
+                     <td className="py-4 text-right">{p.total_trades} (<span className="text-[var(--color-signal-lime)]">{p.winning_trades}</span>/<span className="text-[#ff4a4a]">{p.losing_trades}</span>)</td>
                      <td className="py-4 text-right">{p.win_rate}%</td>
-                     <td className={`py-4 pr-6 text-right font-bold ${p.total_pnl >= 0 ? 'text-[var(--color-signal-lime)]' : 'text-[#ff4a4a]'}`}>
-                       {p.total_pnl >= 0 ? '+' : ''}${p.total_pnl.toFixed(2)}
+                     <td className={`py-4 text-right font-bold ${p.total_pnl > 0 ? 'text-[var(--color-signal-lime)]' : (p.total_pnl < 0 ? 'text-[#ff4a4a]' : '')}`}>
+                       {p.total_pnl > 0 ? '+' : (p.total_pnl < 0 ? '-' : '')}${Math.abs(p.total_pnl).toFixed(2)}
                      </td>
+                     <td className={`py-4 text-right ${p.total_return_pct > 0 ? 'text-[var(--color-signal-lime)]' : (p.total_return_pct < 0 ? 'text-[#ff4a4a]' : '')}`}>
+                       {p.total_return_pct > 0 ? '+' : ''}{(p.total_return_pct * 100).toFixed(2)}%
+                     </td>
+                     <td className={`py-4 text-right ${p.avg_pnl > 0 ? 'text-[var(--color-signal-lime)]' : (p.avg_pnl < 0 ? 'text-[#ff4a4a]' : '')}`}>
+                       {p.avg_pnl > 0 ? '+' : (p.avg_pnl < 0 ? '-' : '')}${Math.abs(p.avg_pnl).toFixed(2)}
+                     </td>
+                     <td className="py-4 text-right text-[var(--color-signal-lime)]">{p.best_trade > 0 ? `+$${p.best_trade.toFixed(2)}` : (p.best_trade < 0 ? `-$${Math.abs(p.best_trade).toFixed(2)}` : '$0.00')}</td>
+                     <td className="py-4 text-right text-[#ff4a4a] pr-4">{p.worst_trade > 0 ? `+$${p.worst_trade.toFixed(2)}` : (p.worst_trade < 0 ? `-$${Math.abs(p.worst_trade).toFixed(2)}` : '$0.00')}</td>
                    </tr>
                  ))}
                </tbody>

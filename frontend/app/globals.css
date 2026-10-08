@@ -98,25 +98,25 @@
     --color-moss-shadow: #314013;
 
     /* Shadcn defaults reassigned slightly so plugins keep working if they rely on it strictly */
-    --background: 222 47% 2%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 5%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 5%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 199 89% 48%; /* Will supersede this manually */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217 33% 13%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 13%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217 33% 15%;
-    --input: 217 33% 15%;
-    --ring: 199 89% 48%;
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 12%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 12%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 75 100% 64%; /* Will supersede this manually */
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 19%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 54%;
+    --accent: 0 0% 15%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 100% 64%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 24%;
+    --input: 0 0% 24%;
+    --ring: 75 100% 64%;
     --radius: 4px;
 
     /* Surfaces */

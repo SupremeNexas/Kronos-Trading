@@ -19,10 +19,14 @@ export default function SignalScannerPage() {
     try {
       const histRes = await fetch("/api/scanner/history");
       if (histRes.ok) {
-        setScanHistory(await histRes.json());
+        const histData = await histRes.json();
+        setScanHistory(histData.scanner_history || []);
       }
       const wlRes = await fetch("/api/scanner/watchlist");
-      if (wlRes.ok) setWatchlist(await wlRes.json());
+      if (wlRes.ok) {
+        const wlData = await wlRes.json();
+        setWatchlist(wlData.watchlist || []);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -69,34 +73,34 @@ export default function SignalScannerPage() {
   };
 
   return (
-    <div className="flex-1 w-full bg-slate-950 p-6 overflow-y-auto">
+    <div className="flex-1 w-full bg-[var(--surface-canvas)] p-6 overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <Zap className="w-6 h-6 text-yellow-400" />
+          <h1 className="text-2xl font-bold text-[var(--color-chalk)] flex items-center gap-2">
+            <Zap className="w-6 h-6 text-[var(--color-signal-lime)]" />
             Crypto Early-Signal Scanner
           </h1>
-          <p className="text-slate-400 mt-1">
+          <p className="text-[var(--color-smoke)] mt-1">
             Independent strategy module based on SebAI framework.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs bg-slate-900 border border-slate-800 rounded px-3 py-1.5 text-slate-300">
-          <Layers className="w-3.5 h-3.5 text-cyan-500" />
+        <div className="flex items-center gap-2 text-xs bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded px-3 py-1.5 text-[var(--color-bone)]">
+          <Layers className="w-3.5 h-3.5 text-[var(--color-signal-lime)]" />
           <span>Status: Active</span>
-          <span className="mx-2 px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">v1.0</span>
+          <span className="mx-2 px-1.5 py-0.5 bg-[var(--surface-raised)] rounded border border-slate-700">v1.0</span>
           <span>Source: CoinGecko V3</span>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 border-b border-slate-800 mb-6">
+      <div className="flex space-x-1 border-b border-[var(--color-graphite)] mb-6">
         <button
           onClick={() => setActiveTab("scanner")}
           className={cn(
             "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
             activeTab === "scanner"
-              ? "border-cyan-500 text-cyan-400"
-              : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              ? "border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]"
+              : "border-transparent text-[var(--color-smoke)] hover:text-[var(--color-bone)] hover:border-slate-700"
           )}
         >
           Scanner
@@ -106,13 +110,13 @@ export default function SignalScannerPage() {
           className={cn(
             "px-4 py-2 text-sm font-medium border-b-2 transition-colors flex items-center gap-2",
             activeTab === "watchlist"
-              ? "border-cyan-500 text-cyan-400"
-              : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              ? "border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]"
+              : "border-transparent text-[var(--color-smoke)] hover:text-[var(--color-bone)] hover:border-slate-700"
           )}
         >
           Research Watchlist
           {watchlist.length > 0 && (
-            <span className="bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded text-xs">
+            <span className="bg-[var(--surface-raised)] text-[var(--color-bone)] px-1.5 py-0.5 rounded text-xs">
               {watchlist.length}
             </span>
           )}
@@ -122,8 +126,8 @@ export default function SignalScannerPage() {
           className={cn(
             "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
             activeTab === "builder"
-              ? "border-cyan-500 text-cyan-400"
-              : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              ? "border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]"
+              : "border-transparent text-[var(--color-smoke)] hover:text-[var(--color-bone)] hover:border-slate-700"
           )}
         >
           Strategy Builder
@@ -133,8 +137,8 @@ export default function SignalScannerPage() {
           className={cn(
             "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
             activeTab === "history"
-              ? "border-cyan-500 text-cyan-400"
-              : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              ? "border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]"
+              : "border-transparent text-[var(--color-smoke)] hover:text-[var(--color-bone)] hover:border-slate-700"
           )}
         >
           Past Scans
@@ -145,8 +149,8 @@ export default function SignalScannerPage() {
           className={cn(
             "px-4 py-2 text-sm font-medium border-b-2 transition-colors",
             activeTab === "performance"
-              ? "border-cyan-500 text-cyan-400"
-              : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
+              ? "border-[var(--color-signal-lime)] text-[var(--color-signal-lime)]"
+              : "border-transparent text-[var(--color-smoke)] hover:text-[var(--color-bone)] hover:border-slate-700"
           )}
         >
           Performance (Coming Soon)
@@ -155,47 +159,47 @@ export default function SignalScannerPage() {
 
       {activeTab === "scanner" && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-            <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-              <Play className="w-4 h-4 text-cyan-400" />
+          <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+            <h3 className="text-[var(--color-chalk)] font-medium mb-4 flex items-center gap-2">
+              <Play className="w-4 h-4 text-[var(--color-signal-lime)]" />
               New Scan
             </h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Assets (CoinGecko IDs, comma separated)</label>
+                <label className="block text-xs font-medium text-[var(--color-smoke)] mb-1">Assets (CoinGecko IDs, comma separated)</label>
                 <input
                   type="text"
                   value={assetsToScan}
                   onChange={(e) => setAssetsToScan(e.target.value)}
                   placeholder="e.g. bitcoin, ethereum, solana"
-                  className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-[var(--surface-canvas)] border border-[var(--color-graphite)] rounded px-3 py-2 text-sm text-[var(--color-bone)] focus:outline-none focus:border-[var(--color-signal-lime)]"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Manual Mentions (Optional, format: id=count)</label>
+                <label className="block text-xs font-medium text-[var(--color-smoke)] mb-1">Manual Mentions (Optional, format: id=count)</label>
                 <input
                   type="text"
                   value={mentionsStr}
                   onChange={(e) => setMentionsStr(e.target.value)}
                   placeholder="e.g. solana=4, dogecoin=2"
-                  className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-[var(--surface-canvas)] border border-[var(--color-graphite)] rounded px-3 py-2 text-sm text-[var(--color-bone)] focus:outline-none focus:border-[var(--color-signal-lime)]"
                 />
               </div>
               
               <button
                 onClick={handleScan}
                 disabled={scanning}
-                className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-medium text-sm transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 bg-[var(--color-signal-lime)] hover:opacity-80 text-[var(--color-void-black)] text-[var(--color-chalk)] px-4 py-2 rounded font-medium text-sm transition-colors disabled:opacity-50"
               >
                 {scanning ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
                 {scanning ? "Scanning..." : "Run Scanner"}
               </button>
             </div>
             
-            <div className="mt-4 p-3 bg-blue-950/30 border border-blue-900/50 rounded flex gap-3 text-sm text-blue-200">
-              <AlertCircle className="w-5 h-5 shrink-0 text-blue-400" />
+            <div className="mt-4 p-3 bg-[var(--surface-raised)] border border-[var(--color-graphite)] rounded flex gap-3 text-sm text-[var(--color-bone)]">
+              <AlertCircle className="w-5 h-5 shrink-0 text-[var(--color-signal-lime)]" />
               <p>
                 <strong>Evaluation Criteria:</strong> 1 point for Volume Ratio &ge; 1.5, 1 point for Attention (Trending or Mentions &ge; 3), 1 point for Momentum &ge; 5%. 
                 Total 3/3 requires ADD TO WATCHLIST. The scanner does <strong>not</strong> produce price predictions or execute automatic trades.
@@ -203,9 +207,9 @@ export default function SignalScannerPage() {
             </div>
           </div>
           
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-            <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-              <History className="w-4 h-4 text-cyan-400" />
+          <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+            <h3 className="text-[var(--color-chalk)] font-medium mb-4 flex items-center gap-2">
+              <History className="w-4 h-4 text-[var(--color-signal-lime)]" />
               Latest Results
             </h3>
             
@@ -216,14 +220,14 @@ export default function SignalScannerPage() {
 
       {activeTab === "watchlist" && (
         <div className="space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-            <h3 className="text-yellow-400 font-medium mb-4 flex items-center gap-2">
+          <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+            <h3 className="text-[var(--color-signal-lime)] font-medium mb-4 flex items-center gap-2">
               <Star className="w-4 h-4" />
               Research Watchlist
             </h3>
             
             {watchlist.length === 0 ? (
-              <p className="text-slate-400 text-sm">No assets in watchlist yet. Run the scanner to discover signals.</p>
+              <p className="text-[var(--color-smoke)] text-sm">No assets in watchlist yet. Run the scanner to discover signals.</p>
             ) : (
               <ScanResultsTable results={watchlist} />
             )}
@@ -232,42 +236,42 @@ export default function SignalScannerPage() {
       )}
       
       {activeTab === "builder" && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-white font-medium mb-4 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-cyan-400" />
+        <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+          <h3 className="text-[var(--color-chalk)] font-medium mb-4 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[var(--color-signal-lime)]" />
             Rule-Based Strategy Builder
           </h3>
-          <p className="text-slate-400 text-sm mb-4">
+          <p className="text-[var(--color-smoke)] text-sm mb-4">
             Design strategies using technical indicators imported from AstraQuant.
             (e.g., EMA, RSI, ATR, MACD Histogram, Bollinger Squeeze).
           </p>
           <div className="space-y-4">
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded">
-              <h4 className="text-sm font-bold text-white mb-2">Technical Indicators Module Status</h4>
-              <p className="text-xs text-emerald-400 flex items-center gap-1">
+            <div className="p-4 bg-[var(--surface-canvas)] border border-[var(--color-graphite)] rounded">
+              <h4 className="text-sm font-bold text-[var(--color-chalk)] mb-2">Technical Indicators Module Status</h4>
+              <p className="text-xs text-[var(--color-signal-lime)] flex items-center gap-1">
                 <CheckCircle2 className="w-3.5 h-3.5" /> Module integrated successfully from AstraQuant engine.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-950 border border-slate-800 p-4 rounded text-sm text-slate-300">
+              <div className="bg-[var(--surface-canvas)] border border-[var(--color-graphite)] p-4 rounded text-sm text-[var(--color-bone)]">
                 <span className="block font-bold text-slate-100 mb-1">RSI (Relative Strength Index)</span>
                 Identifies overbought/oversold conditions dynamically.
               </div>
-              <div className="bg-slate-950 border border-slate-800 p-4 rounded text-sm text-slate-300">
+              <div className="bg-[var(--surface-canvas)] border border-[var(--color-graphite)] p-4 rounded text-sm text-[var(--color-bone)]">
                 <span className="block font-bold text-slate-100 mb-1">Bollinger Squeeze</span>
                 Detects volatility compression for explosive breakout strategies.
               </div>
-              <div className="bg-slate-950 border border-slate-800 p-4 rounded text-sm text-slate-300">
+              <div className="bg-[var(--surface-canvas)] border border-[var(--color-graphite)] p-4 rounded text-sm text-[var(--color-bone)]">
                 <span className="block font-bold text-slate-100 mb-1">MACD Histogram Acceleration</span>
                 Momentum tracking derived from MACD Delta values.
               </div>
-              <div className="bg-slate-950 border border-slate-800 p-4 rounded text-sm text-slate-300">
+              <div className="bg-[var(--surface-canvas)] border border-[var(--color-graphite)] p-4 rounded text-sm text-[var(--color-bone)]">
                 <span className="block font-bold text-slate-100 mb-1">ATR (Average True Range)</span>
                 Dynamic stop-loss sizing based on exact market volatility.
               </div>
             </div>
             
-            <button className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded font-medium text-sm transition-colors mt-6 border border-slate-700 w-full justify-center opacity-50 cursor-not-allowed">
+            <button className="flex items-center gap-2 bg-[var(--surface-raised)] hover:bg-slate-700 text-[var(--color-chalk)] px-4 py-2 rounded font-medium text-sm transition-colors mt-6 border border-slate-700 w-full justify-center opacity-50 cursor-not-allowed">
               <Play className="w-4 h-4" /> Run Rule-Based Backtest (Development Sandboxed)
             </button>
           </div>
@@ -275,20 +279,20 @@ export default function SignalScannerPage() {
       )}
 
       {activeTab === "history" && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-white font-medium mb-4">Complete Scan History</h3>
+        <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+          <h3 className="text-[var(--color-chalk)] font-medium mb-4">Complete Scan History</h3>
           <ScanResultsTable results={scanHistory.slice().reverse()} />
         </div>
       )}
 
       {activeTab === "performance" && (
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-5">
-          <h3 className="text-white font-medium mb-4">Strategy Performance (Coming Soon)</h3>
-          <p className="text-slate-400 text-sm mb-4">
+        <div className="bg-[var(--surface-card)] border border-[var(--color-graphite)] rounded-lg p-5">
+          <h3 className="text-[var(--color-chalk)] font-medium mb-4">Strategy Performance (Coming Soon)</h3>
+          <p className="text-[var(--color-smoke)] text-sm mb-4">
             Compare KRONOS strategy performance vs EARLY_SIGNAL_SCANNER performance vs user decisions.
             This area will display matched performance metrics once manual trades have been executed based on scanner signals.
           </p>
-          <div className="border border-slate-800 rounded bg-slate-950 flex p-8 items-center justify-center text-slate-500">
+          <div className="border border-[var(--color-graphite)] rounded bg-[var(--surface-canvas)] flex p-8 items-center justify-center text-[var(--color-chalk)]0">
             Metrics processing pipeline under construction. (Coming Soon)
           </div>
         </div>
@@ -300,13 +304,13 @@ export default function SignalScannerPage() {
 
 function ScanResultsTable({ results }: { results: any[] }) {
   if (!results || results.length === 0) {
-    return <p className="text-slate-500 text-sm">No scans available.</p>;
+    return <p className="text-[var(--color-chalk)]0 text-sm">No scans available.</p>;
   }
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm text-left">
-        <thead className="text-xs text-slate-400 bg-slate-950/50 uppercase">
+        <thead className="text-xs text-[var(--color-smoke)] bg-[var(--surface-canvas)]/50 uppercase">
           <tr>
             <th className="px-4 py-3 rounded-tl-lg">Timestamp</th>
             <th className="px-4 py-3">Asset</th>
@@ -321,11 +325,11 @@ function ScanResultsTable({ results }: { results: any[] }) {
         <tbody className="divide-y divide-slate-800/50">
           {results.map((res, idx) => (
             <React.Fragment key={res.signal_scan_id + idx}>
-              <tr className="hover:bg-slate-800/20 text-slate-300 group">
-                <td className="px-4 py-3 whitespace-nowrap text-xs text-slate-500">
+              <tr className="hover:bg-[var(--surface-raised)]/20 text-[var(--color-bone)] group">
+                <td className="px-4 py-3 whitespace-nowrap text-xs text-[var(--color-chalk)]0">
                   {new Date(res.timestamp).toLocaleString()}
                 </td>
-                <td className="px-4 py-3 font-medium text-white capitalize">
+                <td className="px-4 py-3 font-medium text-[var(--color-chalk)] capitalize">
                   {res.asset}
                 </td>
                 <td className="px-4 py-3">
@@ -334,7 +338,7 @@ function ScanResultsTable({ results }: { results: any[] }) {
                 <td className="px-4 py-3">{res.attention_score}</td>
                 <td className="px-4 py-3">
                   {typeof res.momentum_7d === "number" ? (
-                    <span className={res.momentum_7d > 0 ? "text-emerald-400" : "text-rose-400"}>
+                    <span className={res.momentum_7d > 0 ? "text-[var(--color-signal-lime)]" : "text-[#ff4a4a]"}>
                       {res.momentum_7d > 0 ? "+" : ""}{res.momentum_7d.toFixed(2)}%
                     </span>
                   ) : res.momentum_7d}
@@ -342,33 +346,33 @@ function ScanResultsTable({ results }: { results: any[] }) {
                 <td className="px-4 py-3 font-bold text-center">
                   <span className={cn(
                     "inline-block px-2 py-0.5 rounded text-xs",
-                    res.score === 3 ? "bg-emerald-500/20 text-emerald-400" :
-                    res.score === 2 ? "bg-yellow-500/20 text-yellow-400" : "bg-slate-800 text-slate-400"
+                    res.score === 3 ? "bg-[var(--color-signal-lime)]/20 text-[var(--color-signal-lime)]" :
+                    res.score === 2 ? "bg-[var(--color-signal-lime)]/20 text-[var(--color-signal-lime)]" : "bg-[var(--surface-raised)] text-[var(--color-smoke)]"
                   )}>
                     {res.score}/3
                   </span>
                 </td>
                 <td className="px-4 py-3">
                   {res.decision === "WATCHLIST" ? (
-                    <span className="text-yellow-400 font-bold flex items-center gap-1 text-xs">
-                      <Star className="w-3 h-3 fill-yellow-400" />
+                    <span className="text-[var(--color-signal-lime)] font-bold flex items-center gap-1 text-xs">
+                      <Star className="w-3 h-3 fill-[var(--color-signal-lime)]" />
                       WATCHLIST
                     </span>
                   ) : (
-                    <span className="text-slate-400 text-xs">MONITOR</span>
+                    <span className="text-[var(--color-smoke)] text-xs">MONITOR</span>
                   )}
                 </td>
                 <td className="px-4 py-3">
                   <Link 
                     href={`/terminal?symbol=${res.asset.toUpperCase()}&strategy=EARLY_SIGNAL_SCANNER&scan_id=${res.signal_scan_id}&score=${res.score}&vol=${typeof res.volume_ratio === 'number' ? res.volume_ratio.toFixed(4) : ''}&attention=${res.attention_score}&momentum=${typeof res.momentum_7d === 'number' ? res.momentum_7d.toFixed(4) : ''}`}
-                    className="px-2 py-1 bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-400 rounded text-xs font-semibold whitespace-nowrap transition-colors"
+                    className="px-2 py-1 bg-[var(--color-signal-lime)]/20 hover:bg-[var(--color-signal-lime)]/40 text-[var(--color-signal-lime)] rounded text-xs font-semibold whitespace-nowrap transition-colors"
                   >
                     Open in Terminal
                   </Link>
                 </td>
               </tr>
-              <tr className="bg-slate-950/20 text-xs text-slate-500">
-                <td colSpan={8} className="px-4 py-2 border-b border-slate-800/10">
+              <tr className="bg-[var(--surface-canvas)]/20 text-xs text-[var(--color-chalk)]0">
+                <td colSpan={8} className="px-4 py-2 border-b border-[var(--color-graphite)]/10">
                   <div className="flex gap-4 opacity-50 group-hover:opacity-100 transition-opacity">
                     <div><strong>Data Source:</strong> {res.data_source}</div>
                     <div className="flex-1">

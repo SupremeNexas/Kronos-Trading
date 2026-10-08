@@ -32,14 +32,14 @@ export default function Trades() {
                <tr className="border-b border-[var(--color-graphite)] text-[var(--color-smoke)]">
                  <th className="py-2">Date</th>
                  <th className="py-2">Symbol</th>
+                 <th className="py-2">Tactic</th>
                  <th className="py-2">Side</th>
                  <th className="py-2">Qty</th>
-                 <th className="py-2">Filled Qty</th>
-                 <th className="py-2">Order Type</th>
-                 <th className="py-2">Limit Price</th>
-                 <th className="py-2">Fill Price</th>
+                 <th className="py-2">Ord/Fill Qty</th>
+                 <th className="py-2">P&L</th>
+                 <th className="py-2">Return</th>
                  <th className="py-2">Status</th>
-                 <th className="py-2">Alpaca ID</th>
+                 <th className="py-2">Reason</th>
                </tr>
              </thead>
              <tbody>
@@ -50,16 +50,20 @@ export default function Trades() {
                )}
                {trades.map((t, i) => (
                  <tr key={i} className="border-b border-[var(--color-graphite)]/50 hover:bg-[var(--surface-hover)]">
-                   <td className="py-2 font-mono text-xs">{t.date}</td>
+                   <td className="py-2 font-mono text-xs max-w-[120px] truncate" title={t.date}>{t.date}</td>
                    <td className="py-2 font-bold">{t.symbol}</td>
+                   <td className="py-2 font-mono text-xs">{t.tactic_name || t.tactic || "MANUAL"}</td>
                    <td className={`py-2 ${t.side?.toUpperCase() === 'BUY' ? 'text-[var(--color-signal-lime)]' : 'text-[var(--color-signal-red)]'}`}>{t.side}</td>
                    <td className="py-2">{t.quantity}</td>
-                   <td className="py-2">{t.filled_quantity !== undefined ? t.filled_quantity : (t.status === 'FILLED' ? t.quantity : 0)}</td>
-                   <td className="py-2">{t.order_type || 'MARKET'}</td>
-                   <td className="py-2">{t.limit_price ? `$${parseFloat(t.limit_price).toFixed(2)}` : '-'}</td>
-                   <td className="py-2">{t.fill_price ? `$${parseFloat(t.fill_price).toFixed(2)}` : '-'}</td>
+                   <td className="py-2">{t.quantity} / {t.filled_quantity !== undefined ? t.filled_quantity : (t.status === 'FILLED' ? t.quantity : 0)}</td>
+                   <td className={`py-2 ${(t.realized_pnl || 0) > 0 ? 'text-[var(--color-signal-lime)]' : ((t.realized_pnl || 0) < 0 ? 'text-[var(--color-signal-red)]' : '')}`}>
+                     {t.realized_pnl ? (t.realized_pnl > 0 ? `+$${parseFloat(t.realized_pnl).toFixed(2)}` : `-$${Math.abs(parseFloat(t.realized_pnl)).toFixed(2)}`) : '-'}
+                   </td>
+                   <td className={`py-2 ${(t.realized_pnl_pct || 0) > 0 ? 'text-[var(--color-signal-lime)]' : ((t.realized_pnl_pct || 0) < 0 ? 'text-[var(--color-signal-red)]' : '')}`}>
+                     {t.realized_pnl_pct ? (t.realized_pnl_pct > 0 ? `+${(parseFloat(t.realized_pnl_pct)*100).toFixed(2)}%` : `${(parseFloat(t.realized_pnl_pct)*100).toFixed(2)}%`) : '-'}
+                   </td>
                    <td className="py-2">{t.status}</td>
-                   <td className="py-2 font-mono text-xs text-[var(--color-ash)]">{t.alpaca_order_id}</td>
+                   <td className="py-2 font-mono text-xs text-[var(--color-ash)] max-w-[150px] truncate" title={t.reasoning}>{t.reasoning || t.notes || '-'}</td>
                  </tr>
                ))}
              </tbody>
