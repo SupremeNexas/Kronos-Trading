@@ -18,6 +18,12 @@ function ManualTradingTerminalInner() {
   const [orderType, setOrderType] = useState('Market');
   const [limitPrice, setLimitPrice] = useState(0);
 
+  const [tactics, setTactics] = useState<any[]>([]);
+  const [selectedTactic, setSelectedTactic] = useState('');
+  const [reasoning, setReasoning] = useState('');
+  const [notes, setNotes] = useState('');
+
+
   const searchParams = useSearchParams();
   const initSymbol = searchParams?.get('symbol') || '';
   const strategyParam = searchParams?.get('strategy') || '';
@@ -34,11 +40,19 @@ function ManualTradingTerminalInner() {
     }
   }, [initSymbol]);
 
+  
   useEffect(() => {
     fetchAccountData();
+    axios.get('/api/tactics').then(res => {
+        if(res.data.success) {
+            setTactics(res.data.tactics);
+            if (res.data.tactics.length > 0) setSelectedTactic(res.data.tactics[0].id);
+        }
+    }).catch(console.error);
     const interval = setInterval(fetchAccountData, 5000);
     return () => clearInterval(interval);
   }, []);
+
 
   const fetchSymbolData = async (sym: string) => {
     try {
@@ -73,12 +87,17 @@ function ManualTradingTerminalInner() {
   const handlePlaceOrder = async () => {
     if (!confirm(`Confirm ${side} ${quantity} ${symbol} @ ${orderType}?`)) return;
     try {
+      let tName = tactics.find(t=>t.id === selectedTactic)?.name || '';
       const payload = {
         symbol,
         side,
         quantity,
         order_type: orderType,
         price: orderType === 'Limit' ? limitPrice : 0,
+        tactic_id: selectedTactic,
+        tactic_name: tName,
+        reasoning,
+        notes,
         analysis_id: forecast?.analysis_id,
         strategy: strategyParam || undefined,
         signal_scan_id: scanIdParam || undefined,

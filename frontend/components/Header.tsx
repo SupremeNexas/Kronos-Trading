@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { label: "TERMINAL", href: "/terminal" },
   { label: "PORTFOLIO", href: "/portfolio" },
   { label: "MY STOCKS", href: "/my-stocks" },
+  { label: "SCANNER", href: "/scanner" },
   { label: "TRADES", href: "/trades" },
   { label: "WATCHLIST", href: "/watchlist" },
   { label: "RESEARCH", href: "/research" },
@@ -29,6 +30,11 @@ export default function Header() {
   useEffect(() => {
     // Exclude auth routes from automatic redirect
     const isAuthRoute = pathname === '/login' || pathname === '/register' || pathname === '/';
+    const isLocalMode = process.env.NEXT_PUBLIC_LOCAL_TRADING_MODE === 'true';
+    if (isLocalMode && isAuthRoute && pathname !== '/dashboard') {
+        window.location.href = '/dashboard';
+        return;
+    }
     axios.get('/api/auth/me', { withCredentials: true })
       .then(res => setUser(res.data.user))
       .catch(err => {

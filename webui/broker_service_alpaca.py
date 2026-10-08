@@ -53,6 +53,20 @@ class AlpacaBrokerAdapter:
             self.available = False
             logging.warning("Alpaca not configured. Operations will fail gracefully.")
 
+
+    def get_tradable_assets(self, asset_class="us_equity"):
+        if not self.available:
+            return []
+        try:
+            from alpaca.trading.requests import GetAssetsRequest
+            from alpaca.trading.enums import AssetClass
+            ac = AssetClass.US_EQUITY if asset_class == "us_equity" else AssetClass.CRYPTO
+            req = GetAssetsRequest(asset_class=ac, status="active")
+            assets = self.client.get_all_assets(req)
+            return [a.symbol for a in assets if a.tradable and a.fractionable]
+        except Exception as e:
+            logging.error(f"Alpaca get_tradable_assets error: {e}")
+            return []
     def get_trading_mode(self) -> Dict[str, Any]:
         return {
             "mode": "paper",
@@ -97,17 +111,32 @@ class AlpacaBrokerAdapter:
     def get_account(self, mark_prices: Optional[Dict[str, float]] = None) -> Dict[str, Any]:
         if not self.available:
             return {"error": "Alpaca not configured", "cash": 0}
-        
+
         try:
             acct = self.client.get_account()
+
+            pv = float(acct.portfolio_value)
+            le = float(acct.last_equity)
+            dp = float(pv) - float(le)
+            dp_pct = (dp / le * 100) if le > 0 else 0.0
+
+            # Approximate total pnl if init cash unknown. We'll use 100,000 as default paper cash.
+            init_cash = 100000.0
+            tp = pv - init_cash
+            tp_pct = (tp / init_cash * 100)
+
             return {
-                "portfolio_value": float(acct.portfolio_value),
+                "total_equity": pv,
+                "portfolio_value": pv,
                 "cash": float(acct.cash),
                 "buying_power": float(acct.buying_power),
                 "positions_value": float(acct.equity) - float(acct.cash),
-                "day_pnl": float(acct.portfolio_value) - float(acct.last_equity),
-                "total_pnl": float(acct.portfolio_value) - 100000.0, # Approximate if initial cash unknown
-                "unrealized_pnl": 0.0,
+                "day_pnl": dp,
+                "today_pnl": dp,
+                "today_pnl_pct": dp_pct,
+                "total_pnl": tp,
+                "unrealized_pnl": tp,
+                "unrealized_pnl_pct": tp_pct,
                 "realized_pnl": 0.0,
                 "trading_mode": "PAPER",
                 "broker_name": "Alpaca Paper Trading",
@@ -119,6 +148,29 @@ class AlpacaBrokerAdapter:
 
     def get_positions(self, mark_prices: Optional[Dict[str, float]] = None) -> List[Dict[str, Any]]:
         if not self.available: return []
+        try:
+            positions = self.client.get_all_positions()
+            res = []
+            for p in positions:
+                res.append({
+                    "symbol": p.symbol,
+                    "side": p.side.value if hasattr(p.side, 'value') else str(p.side.name if hasattr(p.side, 'name') else p.side),
+                    "quantity": float(p.qty),
+                    "avg_price": float(p.avg_entry_price),
+                    "average_price": float(p.avg_entry_price),
+                    "current_price": float(p.current_price),
+                    "market_value": float(p.market_value),
+                    "day_pnl": float(p.unrealized_intraday_pl),
+                    "total_pnl": float(p.unrealized_pl),
+                    "unrealized_pnl": float(p.unrealized_pl),
+                    "unrealized_pnl_pct": float(p.unrealized_plpc) * 100,
+                    "pnl_pct": float(p.unrealized_plpc) * 100,
+                    "opened_at": ""
+                })
+            return res
+        except Exception as e:
+            logging.error(f"Alpaca get_positions error: {e}")
+            return []
         try:
             positions = self.client.get_all_positions()
             res = []

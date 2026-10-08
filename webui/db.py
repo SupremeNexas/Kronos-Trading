@@ -333,26 +333,7 @@ _TABLES_SQL_SQLITE = [
         PRIMARY KEY(user_id, asset)
     )
     ''',
-    '''
-    CREATE TABLE IF NOT EXISTS scanner_trades (
-
-    """CREATE TABLE IF NOT EXISTS trade_history (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        alpaca_order_id TEXT NOT NULL,
-        client_order_id TEXT NOT NULL,
-        symbol TEXT NOT NULL,
-        side TEXT NOT NULL,
-        quantity REAL NOT NULL,
-        filled_quantity REAL DEFAULT 0.0,
-        order_type TEXT NOT NULL,
-        limit_price REAL,
-        fill_price REAL,
-        status TEXT NOT NULL,
-        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        filled_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )""",
+    """CREATE TABLE IF NOT EXISTS scanner_trades (
         user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),
@@ -369,8 +350,43 @@ _TABLES_SQL_SQLITE = [
         position_size FLOAT,
         outcome VARCHAR(50),
         timestamp_at TIMESTAMP
-    )
-    '''
+    )""",
+    """CREATE TABLE IF NOT EXISTS trade_history (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        alpaca_order_id TEXT NOT NULL,
+        client_order_id TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        filled_quantity REAL DEFAULT 0.0,
+        order_type TEXT NOT NULL,
+        limit_price REAL,
+        fill_price REAL,
+        status TEXT NOT NULL,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        filled_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        tactic_id TEXT,
+        tactic_name TEXT,
+        reasoning TEXT,
+        notes TEXT,
+        realized_pnl REAL,
+        realized_pnl_pct REAL,
+        market_price_at_entry REAL,
+        market_price_at_exit REAL
+    )""",
+    """CREATE TABLE IF NOT EXISTS tactics (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        source TEXT,
+        entry_rules TEXT,
+        exit_rules TEXT,
+        risk_rules TEXT,
+        active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )"""
 
 ]
 _TABLES_SQL_POSTGRES = [
@@ -637,26 +653,7 @@ _TABLES_SQL_POSTGRES = [
         PRIMARY KEY(user_id, asset)
     )
     ''',
-    '''
-    CREATE TABLE IF NOT EXISTS scanner_trades (
-
-    """CREATE TABLE IF NOT EXISTS trade_history (
-        id TEXT PRIMARY KEY,
-        user_id TEXT NOT NULL,
-        alpaca_order_id TEXT NOT NULL,
-        client_order_id TEXT NOT NULL,
-        symbol TEXT NOT NULL,
-        side TEXT NOT NULL,
-        quantity REAL NOT NULL,
-        filled_quantity REAL DEFAULT 0.0,
-        order_type TEXT NOT NULL,
-        limit_price REAL,
-        fill_price REAL,
-        status TEXT NOT NULL,
-        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        filled_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )""",
+    """CREATE TABLE IF NOT EXISTS scanner_trades (
         user_id TEXT,
         id VARCHAR(255) PRIMARY KEY,
         signal_scan_id VARCHAR(255),
@@ -673,8 +670,43 @@ _TABLES_SQL_POSTGRES = [
         position_size FLOAT,
         outcome VARCHAR(50),
         timestamp_at TIMESTAMP
-    )
-    '''
+    )""",
+    """CREATE TABLE IF NOT EXISTS trade_history (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        alpaca_order_id TEXT NOT NULL,
+        client_order_id TEXT NOT NULL,
+        symbol TEXT NOT NULL,
+        side TEXT NOT NULL,
+        quantity REAL NOT NULL,
+        filled_quantity REAL DEFAULT 0.0,
+        order_type TEXT NOT NULL,
+        limit_price REAL,
+        fill_price REAL,
+        status TEXT NOT NULL,
+        submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        filled_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        tactic_id TEXT,
+        tactic_name TEXT,
+        reasoning TEXT,
+        notes TEXT,
+        realized_pnl REAL,
+        realized_pnl_pct REAL,
+        market_price_at_entry REAL,
+        market_price_at_exit REAL
+    )""",
+    """CREATE TABLE IF NOT EXISTS tactics (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT,
+        source TEXT,
+        entry_rules TEXT,
+        exit_rules TEXT,
+        risk_rules TEXT,
+        active INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )"""
 
 ]
 class DatabaseManager:

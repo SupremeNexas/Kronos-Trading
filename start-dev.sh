@@ -12,7 +12,8 @@ BACKEND_PID=$!
 echo "Starting Kronos Frontend..."
 cd frontend
 export NEXT_PUBLIC_API_URL=http://localhost:7070
-npm run dev &
+export PORT=3000
+npm run dev -- -p 3000 &
 FRONTEND_PID=$!
 
 echo "Kronos is running!"

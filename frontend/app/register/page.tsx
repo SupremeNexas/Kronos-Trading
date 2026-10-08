@@ -3,6 +3,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 export default function Register() {
+  React.useEffect(() => {
+    if (process.env.NEXT_PUBLIC_LOCAL_TRADING_MODE === 'true') {
+      window.location.href = '/dashboard';
+    }
+  }, []);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');

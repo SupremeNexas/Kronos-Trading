@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
+
+import { redirect } from 'next/navigation';
+
 export default function Home() {
+  if (process.env.NEXT_PUBLIC_LOCAL_TRADING_MODE === 'true') {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[var(--surface-canvas)] font-ui-sans overflow-hidden">
       <main className="flex-1 w-full max-w-[var(--layout-page-max-width)] mx-auto relative pt-[80px] pb-[120px] px-6">

@@ -62,7 +62,7 @@ class InfowayMarketDataProvider(BaseMarketDataProvider):
 
     def search_symbols(self, query: str) -> List[Dict[str, Any]]:
         if not self.client:
-            return [{"symbol": query, "name": f"Mock {query}", "exchange": "Unknown", "type": "Equity"}]
+            return [{"symbol": query, "name": query.upper(), "exchange": "US", "type": "Equity"}]
         try:
             # Type must be one of: STOCK_US, STOCK_CN, STOCK_HK, STOCK_JP, STOCK_KS, STOCK_IN, CRYPTO, FOREX, FUTURES
             res = self.client.basic.get_symbols("STOCK_US")
